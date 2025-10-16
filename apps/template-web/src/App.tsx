@@ -1,22 +1,26 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/dev';
 
-function App() {
-  const [message, setMessage] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
+const App = () => {
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const fetchHello = async () => {
     setLoading(true);
-    try {
-      const response = await fetch(`${API_URL}/hello`);
-      const data = await response.json();
-      setMessage(data.message);
-    } catch (error) {
-      setMessage('Error fetching from API');
-    } finally {
-      setLoading(false);
-    }
+      try {
+        const response = await fetch(`${API_URL}/hello`);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+          const data = await response.json();
+          setMessage(data.message);
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Error fetching from API';
+        setMessage(errorMessage);
+      } finally {
+        setLoading(false);
+      }
   };
 
   return (
