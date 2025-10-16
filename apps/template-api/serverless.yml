@@ -6,7 +6,7 @@ useDotenv: true
 
 provider:
   name: aws
-  runtime: nodejs22.x
+  runtime: nodejs20.x
   region: ap-northeast-2
   stage: ${opt:stage, 'dev'}
   environment:
