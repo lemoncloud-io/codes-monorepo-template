@@ -1,11 +1,42 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 
-export default defineConfig({
-  server: {
-    port: 5173,
-    host: '0.0.0.0',
-    strictPort: true
-  },
-  plugins: [react()],
+const removeVitePrefix = (envVar: string) => envVar.replace('VITE_', '');
+
+const htmlEnvInjectionPlugin = (env: Record<string, string>) => {
+  return {
+    name: 'html-env-injection',
+    transformIndexHtml: {
+      transform(html: string) {
+        const envVars = Object.entries(env)
+            .filter(([key]) => key.startsWith('VITE_'))
+            .reduce((acc, [key, value]) => {
+              acc[removeVitePrefix(key)] = value || '';
+              return acc;
+            }, {} as Record<string, string>);
+
+        const envScript = `<script>
+    (function() {
+      ${Object.entries(envVars)
+          .map(([key, value]) => `window.${key}="${value}";`)
+          .join('\n')}
+    })();
+  </script>`;
+
+        return html.replace(/<body>/, `${envScript}\n<body>`);
+      },
+    },
+  };
+};
+
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '');
+
+  return {
+    server: {
+      port: 3000,
+      host: '0.0.0.0',
+    },
+    plugins: [htmlEnvInjectionPlugin(env), react()],
+  };
 });
