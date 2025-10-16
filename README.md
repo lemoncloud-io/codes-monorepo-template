@@ -60,7 +60,7 @@ GEMINI_API_KEY=your_api_key_here
 Create a `.env.local` file in `apps/template-web/` (copy from `.env.example`):
 
 ```env
-VITE_API_URL=http://localhost:3000/dev
+VITE_API_URL=http://localhost:4000/dev
 ```
 
 ## Development
@@ -72,7 +72,7 @@ pnpm dev
 ```
 
 This will start:
-- API at http://localhost:3000 (Serverless Offline)
+- API at http://localhost:4000 (Serverless Offline)
 - Web at http://localhost:5173 (Vite)
 
 ### Run API only
@@ -81,7 +81,7 @@ This will start:
 pnpm api:dev
 ```
 
-API will be available at http://localhost:3000/dev
+API will be available at http://localhost:4000/dev
 
 ### Run Web only
 
@@ -144,10 +144,10 @@ pnpm web:preview
 
 ### Port already in use
 
-**API (port 3000):**
+**API (port 4000):**
 ```bash
-# Kill process on port 3000
-lsof -ti:3000 | xargs kill -9
+# Kill process on port 4000
+lsof -ti:4000 | xargs kill -9
 ```
 
 **Web (port 5173):**
