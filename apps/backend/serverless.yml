@@ -1,4 +1,4 @@
-service: template-api
+service: backend
 
 frameworkVersion: '3'
 
@@ -11,7 +11,7 @@ provider:
   stage: ${opt:stage, 'dev'}
   environment:
     NODE_ENV: ${self:provider.stage}
-    APP_NAME: ${env:APP_NAME, 'template-api'}
+    APP_NAME: ${env:APP_NAME, 'backend'}
 
 functions:
   hello:

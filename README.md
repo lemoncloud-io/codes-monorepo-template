@@ -13,7 +13,7 @@ Minimal pnpm monorepo with serverless API (AWS Lambda) and React frontend
         │                        │
         ▼                        ▼
 ┌──────────────────┐    ┌──────────────────┐
-│  template-api    │    │  template-web    │
+│  backend    │    │  frontend    │
 │  AWS Lambda      │◄───┤  React SPA       │
 │  Port: 4000      │    │  Port: 3000      │
 └──────────────────┘    └──────────────────┘
@@ -26,7 +26,7 @@ Minimal pnpm monorepo with serverless API (AWS Lambda) and React frontend
 ├── pnpm-workspace.yaml          # Workspace definition
 ├── package.json                 # Root package.json with scripts
 ├── apps/
-│   ├── template-api/            # Serverless API (Node.js 20.x + AWS Lambda)
+│   ├── backend/            # Serverless API (Node.js 20.x + AWS Lambda)
 │   │   ├── serverless.yml       # Serverless Framework config
 │   │   ├── package.json
 │   │   ├── tsconfig.json
@@ -34,7 +34,7 @@ Minimal pnpm monorepo with serverless API (AWS Lambda) and React frontend
 │   │   └── src/
 │   │       └── handlers/        # Lambda handler functions
 │   │           └── hello.ts
-│   └── template-web/            # React + Vite web application
+│   └── frontend/            # React + Vite web application
 │       ├── vite.config.ts       # Vite config with env injection
 │       ├── package.json
 │       ├── tsconfig.json
@@ -64,19 +64,19 @@ pnpm install
 
 ## Environment Variables
 
-### API (apps/template-api)
+### API (apps/backend)
 
-Create a `.env` file in `apps/template-api/` (copy from `.env.example`):
+Create a `.env` file in `apps/backend/` (copy from `.env.example`):
 
 ```env
 NODE_ENV=development
 AWS_REGION=ap-northeast-2
-APP_NAME=template-api
+APP_NAME=backend
 ```
 
-### Web (apps/template-web)
+### Web (apps/frontend)
 
-Create a `.env.local` file in `apps/template-web/` (copy from `.env.example`):
+Create a `.env.local` file in `apps/frontend/` (copy from `.env.example`):
 
 ```env
 VITE_API_URL=http://localhost:4000/dev
@@ -118,7 +118,7 @@ Web will be available at http://localhost:3000
 pnpm web:build
 ```
 
-Build output will be in `apps/template-web/dist/`
+Build output will be in `apps/frontend/dist/`
 
 ### Build all apps
 
