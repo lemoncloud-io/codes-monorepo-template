@@ -2,13 +2,14 @@
   "name": "codes-monorepo-template",
   "private": true,
   "scripts": {
-    "dev": "pnpm --parallel -r dev",
-    "build": "pnpm -r build",
+    "dev": "pnpm --parallel -r --filter './apps/*' dev",
+    "build": "pnpm -r --filter './apps/*' build",
     "api:dev": "pnpm --filter template-api dev",
     "api:deploy": "pnpm --filter template-api deploy",
     "web:dev": "pnpm --filter template-web dev",
     "web:build": "pnpm --filter template-web build",
-    "web:preview": "pnpm --filter template-web preview"
+    "web:preview": "pnpm --filter template-web preview",
+    "typecheck": "pnpm -r run --if-present typecheck"
   },
   "engines": {
     "node": ">=22",

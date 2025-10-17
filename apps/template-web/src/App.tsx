@@ -1,26 +1,26 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { HelloWorldResponse } from '@shared/core';
 
-const API_URL = (window.API_URL || import.meta.env.VITE_API_URL || 'http://localhost:4000/dev')
+const API_URL = (window.API_URL || import.meta.env.VITE_API_URL || 'http://localhost:4000/dev');
 
 const App = () => {
-  const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<HelloWorldResponse | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
 
   const fetchHello = async () => {
     setLoading(true);
-      try {
-        const response = await fetch(`${API_URL}/hello`);
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-          const data = await response.json();
-          setMessage(data.message);
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Error fetching from API';
-        setMessage(errorMessage);
-      } finally {
-        setLoading(false);
-      }
+    setError('');
+    try {
+      const response = await fetch(`${API_URL}/hello`);
+      const result: HelloWorldResponse = await response.json();
+      setData(result);
+    } catch (err) {
+      setError('Error fetching from API');
+      console.error('Error fetching from API', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -41,9 +41,18 @@ const App = () => {
           {loading ? 'Loading...' : 'Call API'}
         </button>
 
-        {message && (
+        {error && (
+          <div style={{ marginTop: '1rem', padding: '1rem', background: '#fee', borderRadius: '4px', color: '#c00' }}>
+            <strong>Error:</strong> {error}
+          </div>
+        )}
+
+        {data && (
           <div style={{ marginTop: '1rem', padding: '1rem', background: '#f0f0f0', borderRadius: '4px' }}>
-            <strong>API Response:</strong> {message}
+            <strong>API Response:</strong>
+            <pre style={{ marginTop: '0.5rem', fontSize: '0.9rem' }}>
+              {JSON.stringify(data, null, 2)}
+            </pre>
           </div>
         )}
       </div>
