@@ -1,20 +1,52 @@
 {
-  "name": "backend",
-  "private": true,
-  "version": "0.0.0",
-  "scripts": {
-    "dev": "serverless offline start",
-    "deploy": "serverless deploy"
-  },
-  "dependencies": {
-    "@shared/core": "workspace:*"
-  },
-  "devDependencies": {
-    "@types/aws-lambda": "^8.10.145",
-    "@types/node": "^24.8.1",
-    "serverless": "^3.38.0",
-    "serverless-esbuild": "^1.54.3",
-    "serverless-offline": "^13.8.1",
-    "typescript": "~5.8.2"
-  }
+    "name": "backend",
+    "version": "0.0.0",
+    "description": "Simplified Boilerplate of Serverless API",
+    "main": "dist/src/index.js",
+    "types": "dist/index.d.ts",
+    "port": 8000,
+    "scripts": {
+        "build": "npm run build-ts",
+        "build-ts": "ttsc",
+        "watch-ts": "ttsc -w",
+        "nodemon": "nodemon --config nodemon-main.json",
+        "start": "npm run build && concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run nodemon\"",
+        "test": "jest --config=jest.config.json",
+        "test:watch": "jest --config=jest.config.json --watchAll",
+        "dev": "npm run start",
+        "deploy": "npm run build && serverless deploy"
+    },
+    "dependencies": {
+        "lemon-core": "^4.0.7",
+        "lemon-model": "^1.0.6",
+        "@shared/core": "workspace:*"
+    },
+    "devDependencies": {
+        "@types/aws-lambda": "^8.10.145",
+        "serverless": "^3.38.0",
+        "serverless-esbuild": "^1.54.3",
+        "serverless-offline": "^13.8.1",
+        "@types/jest": "^27.5.0",
+        "@types/node": "^20.0.0",
+        "@types/supertest": "^2.0.10",
+        "jest": "^27.5.1",
+        "lemon-devkit": "^0.0.6",
+        "nodemon": "^2.0.20",
+        "superagent": "^5.3.1",
+        "supertest": "^4.0.2",
+        "ts-jest": "^27.1.5",
+        "ts-node": "^8.1.0",
+        "ts-transformer-keys": "^0.4.3",
+        "tsconfig-paths": "^4.1.2",
+        "ttypescript": "^1.5.15",
+        "typescript": "^4.7.4",
+        "concurrently": "^7.0.0"
+    },
+    "author": "Steve Jung <steve@lemoncloud.io> (https://eureka.codes)",
+    "license": "ISC",
+    "files": [
+        "handler.js",
+        "dist/**/*"
+    ],
+    "private": false
 }

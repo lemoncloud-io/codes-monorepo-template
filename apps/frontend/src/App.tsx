@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { HelloWorldResponse } from '@shared/core';
 
-const API_URL = (window.API_URL || import.meta.env.VITE_API_URL || 'http://localhost:4000/dev');
+const API_URL = (window.API_URL || import.meta.env.VITE_API_URL || 'http://localhost:8000');
 
 const App = () => {
   const [data, setData] = useState<HelloWorldResponse | null>(null);

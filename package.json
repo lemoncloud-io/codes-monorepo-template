@@ -14,5 +14,9 @@
   "engines": {
     "node": ">=22",
     "pnpm": ">=8"
-  }
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
 }
