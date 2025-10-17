@@ -14,7 +14,7 @@
         "test": "jest --config=jest.config.json",
         "test:watch": "jest --config=jest.config.json --watchAll",
         "dev": "npm run start",
-        "deploy": "npm run build && serverless deploy"
+        "deploy": "npm run start"
     },
     "dependencies": {
         "lemon-core": "^4.0.7",
