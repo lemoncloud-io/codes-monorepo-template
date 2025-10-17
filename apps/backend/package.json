@@ -22,10 +22,6 @@
         "@shared/core": "workspace:*"
     },
     "devDependencies": {
-        "@types/aws-lambda": "^8.10.145",
-        "serverless": "^3.38.0",
-        "serverless-esbuild": "^1.54.3",
-        "serverless-offline": "^13.8.1",
         "@types/jest": "^27.5.0",
         "@types/node": "^20.0.0",
         "@types/supertest": "^2.0.10",
