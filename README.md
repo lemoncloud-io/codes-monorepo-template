@@ -1,6 +1,23 @@
-# Template Monorepo
+# codes-monorepo-template
 
-Simple monorepo structure using pnpm workspaces.
+Minimal pnpm monorepo with serverless API (AWS Lambda) and React frontend
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────┐
+│         Monorepo Root (pnpm workspace)      │
+└─────────────────────────────────────────────┘
+                    │
+        ┌───────────┴────────────┐
+        │                        │
+        ▼                        ▼
+┌──────────────────┐    ┌──────────────────┐
+│  template-api    │    │  template-web    │
+│  AWS Lambda      │◄───┤  React SPA       │
+│  Port: 4000      │    │  Port: 3000      │
+└──────────────────┘    └──────────────────┘
+```
 
 ## Project Structure
 
@@ -9,20 +26,22 @@ Simple monorepo structure using pnpm workspaces.
 ├── pnpm-workspace.yaml          # Workspace definition
 ├── package.json                 # Root package.json with scripts
 ├── apps/
-│   ├── template-api/             # Serverless API (Node.js + AWS Lambda)
-│   │   ├── serverless.yml
+│   ├── template-api/            # Serverless API (Node.js 20.x + AWS Lambda)
+│   │   ├── serverless.yml       # Serverless Framework config
 │   │   ├── package.json
 │   │   ├── tsconfig.json
 │   │   ├── .env.example
 │   │   └── src/
-│   │       ├── handlers/       # Lambda handlers
-│   │       └── services/       # Business logic
-│   └── template-web/             # React + Vite web application
+│   │       └── handlers/        # Lambda handler functions
+│   │           └── hello.ts
+│   └── template-web/            # React + Vite web application
+│       ├── vite.config.ts       # Vite config with env injection
 │       ├── package.json
-│       ├── vite.config.ts
 │       ├── tsconfig.json
 │       ├── .env.example
-│       └── [source code]
+│       └── src/
+│           ├── index.tsx        # App entry point
+│           └── App.tsx          # Main component
 └── README.md
 ```
 
@@ -52,7 +71,7 @@ Create a `.env` file in `apps/template-api/` (copy from `.env.example`):
 ```env
 NODE_ENV=development
 AWS_REGION=ap-northeast-2
-GEMINI_API_KEY=your_api_key_here
+APP_NAME=template-api
 ```
 
 ### Web (apps/template-web)
@@ -73,7 +92,7 @@ pnpm dev
 
 This will start:
 - API at http://localhost:4000 (Serverless Offline)
-- Web at http://localhost:5173 (Vite)
+- Web at http://localhost:3000 (Vite)
 
 ### Run API only
 
@@ -89,7 +108,7 @@ API will be available at http://localhost:4000/dev
 pnpm web:dev
 ```
 
-Web will be available at http://localhost:5173
+Web will be available at http://localhost:3000
 
 ## Build
 
@@ -99,7 +118,7 @@ Web will be available at http://localhost:5173
 pnpm web:build
 ```
 
-Build output will be in `apps/sample-web/dist/`
+Build output will be in `apps/template-web/dist/`
 
 ### Build all apps
 
@@ -150,10 +169,10 @@ pnpm web:preview
 lsof -ti:4000 | xargs kill -9
 ```
 
-**Web (port 5173):**
+**Web (port 3000):**
 ```bash
-# Kill process on port 5173
-lsof -ti:5173 | xargs kill -9
+# Kill process on port 3000
+lsof -ti:3000 | xargs kill -9
 ```
 
 ### Dependencies not installing
