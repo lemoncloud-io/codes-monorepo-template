@@ -1,22 +1,22 @@
 # codes-monorepo-template
 
-Minimal pnpm monorepo with serverless API (AWS Lambda) and React frontend
+pnpm monorepo with lemon-core based serverless API and React frontend
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────┐
-│         Monorepo Root (pnpm workspace)      │
-└─────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────┐
+│         Monorepo Root (pnpm workspace)              │
+└─────────────────────────────────────────────────────┘
                     │
-        ┌───────────┴────────────┐
-        │                        │
-        ▼                        ▼
-┌──────────────────┐    ┌──────────────────┐
-│  template-api    │    │  template-web    │
-│  AWS Lambda      │◄───┤  React SPA       │
-│  Port: 4000      │    │  Port: 3000      │
-└──────────────────┘    └──────────────────┘
+        ┌───────────┴────────────┬─────────────┐
+        │                        │             │
+        ▼                        ▼             ▼
+┌──────────────────┐    ┌──────────────────┐  ┌────────────┐
+│  backend         │    │  frontend        │  │  shared    │
+│  lemon-core API  │◄───┤  React SPA       │  │  packages  │
+│  Port: 8000      │    │  Port: 3000      │  │            │
+└──────────────────┘    └──────────────────┘  └────────────┘
 ```
 
 ## Project Structure
@@ -25,23 +25,42 @@ Minimal pnpm monorepo with serverless API (AWS Lambda) and React frontend
 .
 ├── pnpm-workspace.yaml          # Workspace definition
 ├── package.json                 # Root package.json with scripts
+├── tsconfig.base.json           # Base TypeScript config
 ├── apps/
-│   ├── template-api/            # Serverless API (Node.js 20.x + AWS Lambda)
-│   │   ├── serverless.yml       # Serverless Framework config
+│   ├── backend/                 # lemon-core based API (Node.js + Express/Lambda)
+│   │   ├── handler.js           # Lambda handler wrapper
+│   │   ├── package.json
+│   │   ├── tsconfig.json
+│   │   ├── tsconfig.build.json
+│   │   ├── jest.config.json     # Jest test configuration
+│   │   ├── env/
+│   │   │   └── none.yml         # Environment variables
+│   │   └── src/
+│   │       ├── index.ts         # Main entry point
+│   │       ├── engine.ts        # lemon-core engine initialization
+│   │       ├── express.ts       # Express server setup
+│   │       ├── api/
+│   │       │   └── hello-api.ts # REST API controller
+│   │       └── service/
+│   │           ├── model.ts     # Data models
+│   │           ├── service.ts   # Business logic
+│   │           ├── types.ts     # Type definitions
+│   │           └── views.ts     # View layer
+│   ├── frontend/                # React + Vite web application
+│   │   ├── vite.config.ts       # Vite config with env injection
 │   │   ├── package.json
 │   │   ├── tsconfig.json
 │   │   ├── .env.example
 │   │   └── src/
-│   │       └── handlers/        # Lambda handler functions
-│   │           └── hello.ts
-│   └── template-web/            # React + Vite web application
-│       ├── vite.config.ts       # Vite config with env injection
-│       ├── package.json
-│       ├── tsconfig.json
-│       ├── .env.example
-│       └── src/
-│           ├── index.tsx        # App entry point
-│           └── App.tsx          # Main component
+│   │       ├── index.tsx        # App entry point
+│   │       └── App.tsx          # Main component with API integration
+└── packages/
+    └── shared/                  # Shared types and utilities
+        ├── package.json
+        └── src/
+            ├── index.ts
+            └── types/
+                └── hello.ts     # Shared type definitions
 └── README.md
 ```
 
@@ -51,6 +70,7 @@ Minimal pnpm monorepo with serverless API (AWS Lambda) and React frontend
 - pnpm >= 8
 
 Install pnpm if you haven't already:
+
 ```bash
 npm install -g pnpm
 ```
@@ -58,29 +78,40 @@ npm install -g pnpm
 ## Installation
 
 Install all dependencies:
+
 ```bash
 pnpm install
 ```
 
 ## Environment Variables
 
-### API (apps/template-api)
+### API (apps/backend)
 
-Create a `.env` file in `apps/template-api/` (copy from `.env.example`):
+Environment variables are managed through `apps/backend/env/none.yml`:
 
-```env
-NODE_ENV=development
-AWS_REGION=ap-northeast-2
-APP_NAME=template-api
+```yaml
+# local development configuration
+local:
+  STAGE: 'local'
+  LS: 0                   # log silence
+  LC: 1                   # line-coloring
+  TS: 1                   # time-stamp in line
+  NAME: ''                # profile name
+
+# development server
+dev:
+  STAGE: 'develop'
+
+# production with AWS deploy
+prod:
+  STAGE: 'production'
+  NS: SS
+  TS: 0
 ```
 
-### Web (apps/template-web)
+### Web (apps/frontend)
 
-Create a `.env.local` file in `apps/template-web/` (copy from `.env.example`):
-
-```env
-VITE_API_URL=http://localhost:4000/dev
-```
+Frontend calls API at `http://localhost:8000` by default (configurable via `VITE_API_URL`).
 
 ## Development
 
@@ -91,8 +122,9 @@ pnpm dev
 ```
 
 This will start:
-- API at http://localhost:4000 (Serverless Offline)
-- Web at http://localhost:3000 (Vite)
+
+- API at <http://localhost:8000> (Express + TypeScript watch mode)
+- Web at <http://localhost:3000> (Vite)
 
 ### Run API only
 
@@ -100,7 +132,20 @@ This will start:
 pnpm api:dev
 ```
 
-API will be available at http://localhost:4000/dev
+The API will:
+
+1. Build TypeScript files with `ttsc` (ttypescript)
+2. Watch for TypeScript changes
+3. Auto-reload with nodemon when files change
+4. Run Express server at <http://localhost:8000>
+
+Available endpoints:
+
+- `GET /hello` - List all items
+- `GET /hello/:id` - Get specific item
+- `POST /hello/:id` - Create new item
+- `PUT /hello/:id` - Update item
+- `DELETE /hello/:id` - Delete item
 
 ### Run Web only
 
@@ -108,35 +153,40 @@ API will be available at http://localhost:4000/dev
 pnpm web:dev
 ```
 
-Web will be available at http://localhost:3000
+Web will be available at <http://localhost:3000>
+
+### Run Tests
+
+```bash
+# Run all tests
+cd apps/backend
+npm run test
+
+# Watch mode
+npm run test:watch
+```
 
 ## Build
 
-### Build Web application
-
 ```bash
-pnpm web:build
-```
-
-Build output will be in `apps/template-web/dist/`
-
-### Build all apps
-
-```bash
+# Build all apps
 pnpm build
+
+# Build backend only
+cd apps/backend && npm run build
+
+# Build frontend only  
+pnpm web:build
 ```
 
 ## Deployment
 
-### Deploy API to AWS
-
-Make sure you have AWS credentials configured, then:
-
 ```bash
+# Deploy API to AWS Lambda
 pnpm api:deploy
-```
 
-This will deploy the serverless API to AWS Lambda.
+# Or run standalone Express server
+cd apps/backend && npm run build && node dist/src/index.js
 
 ### Preview Web build
 
@@ -150,26 +200,28 @@ pnpm web:preview
 
 | Command | Description |
 |---------|-------------|
-| `pnpm dev` | Run all apps in parallel |
+| `pnpm dev` | Run all apps in parallel (backend + frontend) |
 | `pnpm build` | Build all apps |
-| `pnpm api:dev` | Run API only |
-| `pnpm api:deploy` | Deploy API to AWS |
-| `pnpm web:dev` | Run web app only |
-| `pnpm web:build` | Build web app only |
-| `pnpm web:preview` | Preview web app build |
+| `pnpm api:dev` | Run backend only (Express at :8000) |
+| `pnpm api:deploy` | Deploy backend to AWS Lambda |
+| `pnpm web:dev` | Run frontend only (Vite at :3000) |
+| `pnpm web:build` | Build frontend for production |
+| `pnpm web:preview` | Preview frontend build |
 
 
 ## Troubleshooting
 
 ### Port already in use
 
-**API (port 4000):**
+**API (port 8000):**
+
 ```bash
-# Kill process on port 4000
-lsof -ti:4000 | xargs kill -9
+# Kill process on port 8000
+lsof -ti:8000 | xargs kill -9
 ```
 
 **Web (port 3000):**
+
 ```bash
 # Kill process on port 3000
 lsof -ti:3000 | xargs kill -9
@@ -180,7 +232,7 @@ lsof -ti:3000 | xargs kill -9
 ```bash
 # Clear pnpm cache and reinstall
 pnpm store prune
-rm -rf node_modules apps/*/node_modules
+rm -rf node_modules apps/*/node_modules packages/*/node_modules
 pnpm install
 ```
 
