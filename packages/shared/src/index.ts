@@ -4,3 +4,4 @@
  */
 
 export * from './types/hello';
+export * from './types/ai-blog-title-generator';

@@ -2,6 +2,10 @@
 node_modules/
 .pnpm-store/
 
+# sample files but not zip files
+sample/**
+!sample/*.zip
+
 # Build outputs
 dist/
 build/

@@ -22,6 +22,14 @@ functions:
           path: /hello
           method: get
           cors: true
+  blogTitleGenerator:
+    handler: src/handlers/blog-title-generator.handler
+    timeout: 30
+    events:
+      - http:
+          path: /blog-title-generator
+          method: post
+          cors: true
 
 plugins:
   - serverless-offline
