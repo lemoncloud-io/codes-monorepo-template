@@ -161,6 +161,26 @@ export class HelloAPIController extends GeneralWEBController {
         delete this.BUFF[i];
         return this.modelAsView(node);
     };
+
+    /**
+     * generate blog content
+     *
+     * ```sh
+     * $ http :8000/hello/0/generate-content keyword=hello
+     */
+    public doPostGenerateContent: NextHandler = async (id, param, body, context) => {
+        const errScope = `doPostBlogTitle(${this.type()}/${id ?? ''})`;
+        _log(NS, `${errScope} ...`);
+        if (id == 'echo') return this.doPostEcho('0', param, body, context);
+
+        //* validate parameters.
+        if (!body?.keyword) throw new Error(`.keyword (string) is required - ${errScope}`);
+        const keyword = $T.S2(body?.keyword, '', ' ').trim(); // clear new-lines
+
+        //* generate blog content
+        const $res = await this.service.generateBlogContent(keyword);
+        return { ...$res };
+    };
 }
 
 //*export as default.

@@ -10,6 +10,7 @@
  */
 import { $U, _log, CoreManager, CoreService, GeneralItem } from 'lemon-core';
 import { $FIELD, Model, ModelType, TestModel } from './model';
+import { generateBlogContent } from '../lib/gemini';
 const NS = $U.NS('hello', 'blue'); // NAMESPACE TO BE PRINTED.
 
 /**
@@ -35,6 +36,11 @@ export class HelloService extends CoreService<Model, ModelType> {
      * hello.
      */
     public hello = () => `hello-service`;
+
+    /**
+     * generate blog content
+     */
+     public generateBlogContent = async (keyword: string) => await generateBlogContent(keyword);
 }
 
 /**

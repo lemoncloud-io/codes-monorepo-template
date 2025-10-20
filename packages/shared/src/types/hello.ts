@@ -13,3 +13,11 @@ export interface HelloWorldMetadata {
   appName: string;
   environment: string;
 }
+
+/**
+ * Response type for Blog Title application
+ */
+export interface GeneratedContent {
+  titles: string[];
+  tags: string[];
+}
