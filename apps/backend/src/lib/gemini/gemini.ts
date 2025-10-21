@@ -26,8 +26,8 @@ const responseSchema = {
   required: ["titles", "tags"],
 };
 
-export async function generateBlogContent(keyword: string): Promise<GeneratedContent> {
-  const prompt = `'${keyword}'라는 키워드에 대한 블로그 포스팅 제목 5개와 관련 태그 10개를 생성해줘. 제목은 사람들의 클릭을 유도할 수 있도록 흥미롭고 창의적으로 만들어줘. 태그는 검색에 유리하도록 핵심적인 내용으로 구성해줘. 결과는 JSON 형식으로 반환해줘.`;
+export async function generateBlogContent($param?: { keyword: string }): Promise<GeneratedContent> {
+  const prompt = `'${$param?.keyword}'라는 키워드에 대한 블로그 포스팅 제목 5개와 관련 태그 10개를 생성해줘. 제목은 사람들의 클릭을 유도할 수 있도록 흥미롭고 창의적으로 만들어줘. 태그는 검색에 유리하도록 핵심적인 내용으로 구성해줘. 결과는 JSON 형식으로 반환해줘.`;
 
   try {
     const response = await ai.models.generateContent({

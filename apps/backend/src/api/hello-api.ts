@@ -11,6 +11,7 @@
 import { $T, $U, _log, NextHandler, GeneralWEBController, NextContext } from 'lemon-core';
 import { Model, TestModel } from '../service/model';
 import { HelloService } from '../service/service';
+import { generateBlogContent } from '../lib/gemini/gemini';
 const NS = $U.NS('hello', 'yellow'); // NAMESPACE TO BE PRINTED.
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -166,19 +167,19 @@ export class HelloAPIController extends GeneralWEBController {
              * Generate blog content using Gemini API.
              *
              * ```sh
-             * $ echo '{"keyword":"your keyword"}' | http POST ':8000/hello/test-content'
+             * $ echo '{"keyword":"your keyword"}' | http POST ':8000/hello/:id/generate'
+             * $ http POST ':8000/hello/generate-blog-content/generate' keyword="your keyword"
              * ```
              */
-            public doPostTestContent: NextHandler = async (id, param, body, context) => {
-                const errScope = `doPostTestContent(${this.type()}/${id ?? ''})`;
+            public doPostGenerate: NextHandler = async (id, param, body, context) => {
+                const errScope = `doPostGenerate(${this.type()}/${id ?? ''})`;
                 _log(NS, `${errScope} ...`);
 
-                if (!this.service) throw new Error(`500 INTERNAL SERVER ERROR - service is not defined`);
-                if (!body?.keyword) throw new Error(`.keyword (string) is required - ${errScope}`);
-
-                const keyword = $T.S(body.keyword, '');
-                const result = await this.service.generateContent(keyword);
-                return result;
+                //TODO - GEMINI API MAPPING.
+                if (id == 'generate-blog-content') {
+                    const $param = { keyword: body?.keyword ?? '' }; //todo - use transformer.
+                    return generateBlogContent(body);
+                }
             };
 }
 
