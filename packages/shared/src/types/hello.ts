@@ -15,7 +15,7 @@ export interface HelloWorldMetadata {
 }
 
 /**
- * Response type for Blog Title application
+ * Represents the structure for generated content, including titles and tags.
  */
 export interface GeneratedContent {
   titles: string[];

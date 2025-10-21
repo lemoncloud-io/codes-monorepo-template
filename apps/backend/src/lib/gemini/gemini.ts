@@ -1,7 +1,6 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import type { GeneratedContent } from '@shared/core/src/types/hello';
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 dotenv.config();
 
 if (!process.env.API_KEY) {

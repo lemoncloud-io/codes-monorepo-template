@@ -38,9 +38,13 @@ export class HelloService extends CoreService<Model, ModelType> {
     public hello = () => `hello-service`;
 
     /**
-     * generate blog content
+     * Generates blog content using the Gemini API.
+     * @param keyword The keyword to generate content for.
+     * @returns Generated titles and tags.
      */
-     public generateBlogContent = async (keyword: string) => await generateBlogContent(keyword);
+    public generateContent = async (keyword: string) => {
+        return generateBlogContent(keyword);
+    };
 }
 
 /**

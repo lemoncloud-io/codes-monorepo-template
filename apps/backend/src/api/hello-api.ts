@@ -162,25 +162,24 @@ export class HelloAPIController extends GeneralWEBController {
         return this.modelAsView(node);
     };
 
-    /**
-     * generate blog content
-     *
-     * ```sh
-     * $ http :8000/hello/0/generate-content keyword=hello
-     */
-    public doPostGenerateContent: NextHandler = async (id, param, body, context) => {
-        const errScope = `doPostBlogTitle(${this.type()}/${id ?? ''})`;
-        _log(NS, `${errScope} ...`);
-        if (id == 'echo') return this.doPostEcho('0', param, body, context);
+            /**
+             * Generate blog content using Gemini API.
+             *
+             * ```sh
+             * $ echo '{"keyword":"your keyword"}' | http POST ':8000/hello/test-content'
+             * ```
+             */
+            public doPostTestContent: NextHandler = async (id, param, body, context) => {
+                const errScope = `doPostTestContent(${this.type()}/${id ?? ''})`;
+                _log(NS, `${errScope} ...`);
 
-        //* validate parameters.
-        if (!body?.keyword) throw new Error(`.keyword (string) is required - ${errScope}`);
-        const keyword = $T.S2(body?.keyword, '', ' ').trim(); // clear new-lines
+                if (!this.service) throw new Error(`500 INTERNAL SERVER ERROR - service is not defined`);
+                if (!body?.keyword) throw new Error(`.keyword (string) is required - ${errScope}`);
 
-        //* generate blog content
-        const $res = await this.service.generateBlogContent(keyword);
-        return { ...$res };
-    };
+                const keyword = $T.S(body.keyword, '');
+                const result = await this.service.generateContent(keyword);
+                return result;
+            };
 }
 
 //*export as default.
