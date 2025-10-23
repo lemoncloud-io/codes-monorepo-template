@@ -21,15 +21,15 @@
         "lemon-model": "^1.0.6"
     },
     "devDependencies": {
-        "@types/jest": "^27.5.0",
+        "@types/jest": "^29.5.12",
         "@types/node": "^20.0.0",
         "@types/supertest": "^2.0.10",
-        "jest": "^27.5.1",
+        "jest": "^29.7.0",
         "lemon-devkit": "^0.0.6",
         "nodemon": "^2.0.20",
         "superagent": "^5.3.1",
         "supertest": "^4.0.2",
-        "ts-jest": "^27.1.5",
+        "ts-jest": "^29.1.2",
         "ts-node": "^8.1.0",
         "ts-transformer-keys": "^0.4.3",
         "tsconfig-paths": "^4.1.2",
