@@ -10,7 +10,6 @@
  */
 import { $U, _log, CoreManager, CoreService, GeneralItem } from 'lemon-core';
 import { $FIELD, Model, ModelType, TestModel } from './model';
-import { generateBlogContent } from '../lib/gemini/gemini';
 const NS = $U.NS('hello', 'blue'); // NAMESPACE TO BE PRINTED.
 
 /**
@@ -36,15 +35,6 @@ export class HelloService extends CoreService<Model, ModelType> {
      * hello.
      */
     public hello = () => `hello-service`;
-
-    /**
-     * Generates blog content using the Gemini API.
-     * @param keyword The keyword to generate content for.
-     * @returns Generated titles and tags.
-     */
-    public generateContent = async (keyword: string) => {
-        return generateBlogContent(keyword);
-    };
 }
 
 /**
