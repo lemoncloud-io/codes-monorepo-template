@@ -13,11 +13,3 @@ export interface HelloWorldMetadata {
   appName: string;
   environment: string;
 }
-
-/**
- * Represents the structure for generated content, including titles and tags.
- */
-export interface GeneratedContent {
-  titles: string[];
-  tags: string[];
-}
