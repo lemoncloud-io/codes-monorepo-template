@@ -20,8 +20,7 @@
         "lemon-core": "^4.0.7",
         "lemon-model": "^1.0.6",
         "@shared/core": "workspace:*",
-        "@google/genai": "^1.25.0",
-        "dotenv": "^17.2.3"
+        "@google/genai": "^1.25.0"
     },
     "devDependencies": {
         "@types/jest": "^27.5.0",

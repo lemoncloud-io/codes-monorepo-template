@@ -11,7 +11,7 @@
 import { $T, $U, _log, NextHandler, GeneralWEBController, NextContext } from 'lemon-core';
 import { Model, TestModel } from '../service/model';
 import { HelloService } from '../service/service';
-import { generateBlogContent } from '../lib/gemini/gemini';
+import { generateBlogContent } from '../services/geminiService';
 const NS = $U.NS('hello', 'yellow'); // NAMESPACE TO BE PRINTED.
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -112,6 +112,7 @@ export class HelloAPIController extends GeneralWEBController {
         const errScope = `doPost(${this.type()}/${id ?? ''})`;
         _log(NS, `${errScope} ...`);
         if (id == 'echo') return this.doPostEcho('0', param, body, context);
+        if (id && param.cmd === 'generate') return this.doPostGenerate(id, param, body, context);
 
         //* append into array.
         _log(NS, errScope);
@@ -163,24 +164,25 @@ export class HelloAPIController extends GeneralWEBController {
         return this.modelAsView(node);
     };
 
-            /**
-             * Generate blog content using Gemini API.
-             *
-             * ```sh
-             * $ echo '{"keyword":"your keyword"}' | http POST ':8000/hello/:id/generate'
-             * $ http POST ':8000/hello/generate-blog-content/generate' keyword="your keyword"
-             * ```
-             */
-            public doPostGenerate: NextHandler = async (id, param, body, context) => {
-                const errScope = `doPostGenerate(${this.type()}/${id ?? ''})`;
-                _log(NS, `${errScope} ...`);
+    /**
+     * Generate content using Gemini API.
+     *
+     * ```sh
+     * $ http POST ':8000/hello/ai-blog-title-generator/generate' keyword='Next.js'
+     */
+    public doPostGenerate: NextHandler = async (id, param, body, context) => {
+        const errScope = `doPostGenerate(${this.type()}/${id ?? ''})`;
+        _log(NS, `${errScope} ...`);
 
-                //TODO - GEMINI API MAPPING.
-                if (id == 'generate-blog-content') {
-                    const $param = { keyword: body?.keyword ?? '' }; //todo - use transformer.
-                    return generateBlogContent(body);
-                }
-            };
+        if (id === 'ai-blog-title-generator') {
+            const { keyword } = body;
+            if (!keyword) throw new Error('`keyword` is required.');
+            const $param = { keyword };
+            return await generateBlogContent($param);
+        }
+
+        throw new Error(`404 NOT FOUND - id:${id}`);
+    };
 }
 
 //*export as default.
