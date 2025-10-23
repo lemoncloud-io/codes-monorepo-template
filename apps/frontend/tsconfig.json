@@ -5,9 +5,6 @@
     "jsx": "react-jsx",
     "allowImportingTsExtensions": true,
     "baseUrl": ".",
-    "paths": {
-      "@shared/*": ["../../packages/shared/src/*"]
-    }
   },
   "include": ["src"]
 }
