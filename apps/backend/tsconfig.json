@@ -3,7 +3,7 @@
         "allowJs": true,
         "experimentalDecorators": true,
         "module": "commonjs",
-        "rootDir": "../..",
+        "rootDir": ".",
         "resolveJsonModule": true,
         "esModuleInterop": true,
         "removeComments": true,
