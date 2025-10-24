@@ -5,6 +5,10 @@
     "jsx": "react-jsx",
     "allowImportingTsExtensions": true,
     "baseUrl": ".",
+    "paths": {
+      "@shared": ["src/shared/index.ts"],
+      "@shared/*": ["src/shared/*"]
+    },
   },
   "include": ["src"]
 }
