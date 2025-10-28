@@ -1,0 +1,166 @@
+backend:
+  environ:
+    LS:
+      isRequired: 1
+      type: boolean
+      defaultValue: 0
+      description: 'Hide logs (0: disabled, 1: enabled)'
+      redeploy: 1
+    LC:
+      isRequired: 1
+      type: boolean
+      defaultValue: 1
+      description: 'Enable log coloring (0: disabled, 1: enabled)'
+      redeploy: 1
+    TS:
+      isRequired: 1
+      type: boolean
+      defaultValue: 1
+      description: 'Include timestamp in logs (0: disabled, 1: enabled)'
+      redeploy: 1
+    NAME:
+      isRequired: 1
+      type: string
+      defaultValue: temp
+      description: 'Project profile name - e.g., lemon'
+      isHidden: 1
+    STAGE:
+      isRequired: 1
+      type: string
+      options:
+        - develop
+        - production
+      defaultValue: develop
+      description: 'Deployment stage'
+      isHidden: 1
+      immutable: 1
+    MY_DYNAMO_TABLE:
+      isRequired: 0
+      type: string
+      description: 'Name of the DynamoDB table to use for integration'
+      immutable: 1
+    SQS_ENDPOINT:
+      isRequired: 0
+      type: string
+      description: 'SQS endpoint or configuration to integrate'
+      immutable: 0
+    API_KEY:
+      isRequired: 0
+      type: string
+      description: 'API key for using Gemini'
+      immutable: 0
+  config:
+    name:
+      isRequired: 1
+      type: string
+      defaultValue: temp
+      description: 'Name for project identification'
+      isHidden: 1
+    runtime:
+      isRequired: 1
+      type: string
+      options:
+        - nodejs18.x
+        - nodejs22.x
+      defaultValue: nodejs22.x
+      description: 'Runtime environment'
+      immutable: 1
+    region:
+      isRequired: 1
+      type: string
+      defaultValue: ap-northeast-2
+      description: 'AWS region'
+      immutable: 1
+    stage:
+      isRequired: 1
+      type: string
+      options:
+        - dev
+        - prod
+      defaultValue: dev
+      description: 'Deployment stage'
+      immutable: 1
+  search:
+    OS2_INDEX:
+      isRequired: 0
+      immutable: 0
+      type: string
+      description: 'open-search index name'
+      redeploy: 1
+    OS2_ENDPOINT:
+      isRequired: 0
+      immutable: 0
+      type: string
+      description: 'open-search endpoint'
+      redeploy: 1
+    OS2_SECRET_KEY:
+      isRequired: 0
+      immutable: 0
+      isHidden: 1
+      type: string
+      description: 'open-search secret key'
+      redeploy: 1
+    OS2_ACCESS_KEY:
+      isRequired: 0
+      immutable: 0
+      isHidden: 1
+      type: string
+      description: 'open-search access key'
+    OS2_JWT_TOKEN:
+      isRequired: 0
+      immutable: 0
+      type: string
+      description: 'open-search jwt token'
+      isHidden: 1
+    ES6_INDEX:
+      isRequired: 0
+      immutable: 0
+      type: string
+      description: 'elasticsearch index name'
+      redeploy: 1
+    ES6_ENDPOINT:
+      isRequired: 0
+      immutable: 0
+      type: string
+      description: 'elasticsearch endpoint'
+      redeploy: 1
+    ES6_VERSION:
+      isRequired: 0
+      immutable: 0
+      type: string
+      description: 'elasticsearch version'
+      redeploy: 1
+frontend:
+  environ:
+    AWS_REGION:
+      isRequired: 1
+      type: string
+      description: 'AWS region'
+      defaultValue: 'ap-northeast-2'
+    AWS_DEPLOY_TARGET:
+      isRequired: 1
+      type: string
+      description: 'AWS deploy target'
+      defaultValue: 'develop'
+    AWS_BUCKET_NAME:
+      isRequired: 1
+      type: string
+      description: 'AWS bucket name'
+    APP_NAME:
+      isRequired: 1
+      type: string
+      description: 'App name'
+      defaultValue: 'web'
+    VITE_API_URL:
+      isRequired: 1
+      type: string
+      description: 'API URI deployed on AWS Lambda'
+    VITE_ENV:
+      isRequired: 1
+      type: string
+      description: 'Vite environment'
+      defaultValue: 'DEV'
+    VITE_HOST:
+      isRequired: 1
+      type: string
+      description: 'Vite host'
