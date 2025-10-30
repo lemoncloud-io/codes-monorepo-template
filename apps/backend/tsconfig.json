@@ -15,7 +15,15 @@
         "outDir": "./dist",
         "baseUrl": ".",
         "paths": {
-            "@shared/*": ["../../packages/shared/src/*"]
+            "@shared": [
+                "src/shared/index.ts"
+            ],
+            "@shared/*": [
+                "src/shared/*"
+            ],
+            "*": [
+                "node_modules/*",
+            ]
         },
         "plugins": [
             {

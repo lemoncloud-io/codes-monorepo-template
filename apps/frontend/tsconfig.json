@@ -6,8 +6,9 @@
     "allowImportingTsExtensions": true,
     "baseUrl": ".",
     "paths": {
-      "@shared/*": ["../../packages/shared/src/*"]
-    }
+      "@shared": ["src/shared/index.ts"],
+      "@shared/*": ["src/shared/*"]
+    },
   },
   "include": ["src"]
 }

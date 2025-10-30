@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HelloWorldResponse } from '@shared/core';
+import { HelloWorldResponse } from '@shared';
 
 const API_URL = (window.API_URL || import.meta.env.VITE_API_URL || 'http://localhost:8000');
 
