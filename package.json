@@ -9,7 +9,8 @@
     "web:dev": "pnpm --filter frontend dev",
     "web:build": "pnpm --filter frontend build",
     "web:preview": "pnpm --filter frontend preview",
-    "typecheck": "pnpm -r run --if-present typecheck"
+    "typecheck": "pnpm -r run --if-present typecheck",
+    "refactor-prep": "node ./refactor-prep.js"
   },
   "engines": {
     "node": ">=22",
