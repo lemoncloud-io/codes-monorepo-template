@@ -7,7 +7,7 @@ echo "Starting pre-steps for backend code refactoring..."
 BACKEND_DIR="apps/backend"
 PKG_JSON="$BACKEND_DIR/package.json"
 APP_DIR="sample/ai-blog-title-generator"
-APP_SERVICES="$APP_DIR/services"
+APP_SERVICES="$APP_DIR/services/geminiService.ts"
 APP_TYPES="$APP_DIR/types.ts"
 BACKEND_SERVICES="$BACKEND_DIR/src/services"
 FRONTEN_DIR="apps/frontend"
@@ -44,16 +44,16 @@ else
 fi
 cd ../..
 
-# 2. services 폴더 복사
+# 2. geminiService 파일 복사
 # ----------------------------------------------------------
-echo "[2/4] Copying services folder..."
+echo "[2/4] Copying geminiService.ts file..."
 
-if [ -d "$APP_SERVICES" ]; then
-  cp -r "$APP_SERVICES" "./apps/backend/src"
-  echo "Copy services folder successful! → apps/backend/src"
-  ls -R "apps/backend/src/services" || echo "Copy services folder failed."
+if [ -f "$APP_SERVICES" ]; then
+  cp "$APP_SERVICES" "./$BACKEND_SERVICES/geminiService.ts"
+  echo "Copy gemini service file successful!"
+  ls "$BACKEND_SERVICE/geminiService.ts" 2>/dev/null || echo "Copy to backend failed."
 else
-  echo "Services folder not exist → $APP_SERVICES"
+  echo "Gemini Service file not exist → $APP_SERVICES"
 fi
 
 # 3. types.ts 파일 복사
