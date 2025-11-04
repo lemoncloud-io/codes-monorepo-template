@@ -17,6 +17,7 @@
         "deploy": "npm run start"
     },
     "dependencies": {
+        "@google/genai": "^1.28.0",
         "lemon-core": "^4.0.7",
         "lemon-model": "^1.0.6"
     },
@@ -24,6 +25,7 @@
         "@types/jest": "^27.5.0",
         "@types/node": "^20.0.0",
         "@types/supertest": "^2.0.10",
+        "concurrently": "^7.0.0",
         "jest": "^27.5.1",
         "lemon-devkit": "^0.0.6",
         "nodemon": "^2.0.20",
@@ -34,8 +36,7 @@
         "ts-transformer-keys": "^0.4.3",
         "tsconfig-paths": "^4.1.2",
         "ttypescript": "^1.5.15",
-        "typescript": "^4.7.4",
-        "concurrently": "^7.0.0"
+        "typescript": "^4.7.4"
     },
     "author": "Steve Jung <steve@lemoncloud.io> (https://eureka.codes)",
     "license": "ISC",
