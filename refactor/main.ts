@@ -1,5 +1,5 @@
 /**
- * Gemini API를 사용하여 TypeScript 코드를 리팩토링하는 스크립트
+ * Gemini API를 사용하여 TypeScript 코드를 리팩토링하는 스크립트(샘플)
  * 
  * 사용법:
  * ```sh
@@ -76,7 +76,10 @@ ${codeToRefactor}
     const jsonString = result?.text?.trim();
     const _parseJson = (txt: any) => {
         try {
-            if (typeof txt === 'string' && txt.startsWith("```") && txt.endsWith("```")) {
+            const match = typeof txt === 'string' ? txt.match(/^```(?:typescript|ts)?\s*\n?([\s\S]*?)\n?```[\s\n]*$/) : null;
+            if (match) {
+                txt = match[1];
+            } else if (typeof txt === 'string' && txt.startsWith("```") && txt.endsWith("```")) {
                 const lines = txt.split('\n');
                 lines.shift(); // 첫 번째 줄 제거 (```typescript)
                 lines.pop();   // 마지막 줄 제거 (```)

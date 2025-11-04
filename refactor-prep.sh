@@ -1,13 +1,23 @@
 #!/bin/sh
+# backend-refactor-prep.sh
+# - 이 스크립트는 백엔드 코드 리팩토링을 준비하기 위한 사전 단계를 수행합니다.
+# - 사용법: ./backend-refactor-prep.sh <name-in-sample-app>
+# - 예시: ./backend-refactor-prep.sh ai-blog-title-generator
 
 set -e  # 오류 발생 시 즉시 종료
 
 echo "Starting pre-steps for backend code refactoring..."
 
+if [ -z "$1" ]; then
+  echo "Usage: $0 <name-in-sample-app>"
+  exit 1
+fi
+
+APP_NAME="$1"
 BACKEND_DIR="apps/backend"
 PKG_JSON="$BACKEND_DIR/package.json"
-APP_DIR="sample/ai-blog-title-generator"
-APP_SERVICES="$APP_DIR/services/geminiService.ts"
+APP_DIR="sample/$APP_NAME"
+APP_SERVICES="$APP_DIR/services"
 APP_TYPES="$APP_DIR/types.ts"
 BACKEND_SERVICES="$BACKEND_DIR/src/services"
 FRONTEN_DIR="apps/frontend"
@@ -22,34 +32,12 @@ if [ ! -f "$PKG_JSON" ]; then
   exit 1
 fi
 
-if ! command -v jq >/dev/null 2>&1; then
-  echo "Error: jq is not installed. (macOS: brew install jq, Ubuntu: sudo apt install jq)"
-  exit 1
-fi
-
-# Add @google/genai to dependencies
-TEMP_FILE=$(mktemp)
-jq '(.dependencies //= {}) | .dependencies["@google/genai"] = "^1.25.0"' "$PKG_JSON" > "$TEMP_FILE" && mv "$TEMP_FILE" "$PKG_JSON"
-echo "package.json 업데이트 완료 (@google/genai:^1.25.0)"
-    echo "package.json update successful!"
-
-# pnpm install
-cd "$BACKEND_DIR"
-if pnpm install; then
-  echo "pnpm install successful!"
-
-else
-  echo "pnpm install Failed. Script exits."
-  exit 1
-fi
-cd ../..
-
 # 2. geminiService 파일 복사
 # ----------------------------------------------------------
 echo "[2/4] Copying geminiService.ts file..."
 
-if [ -f "$APP_SERVICES" ]; then
-  cp "$APP_SERVICES" "./$BACKEND_SERVICES/geminiService.ts"
+if [ -f "$APP_SERVICES/geminiService.ts" ]; then
+  cp -rf "$APP_SERVICES/" "./$BACKEND_SERVICES/"
   echo "Copy gemini service file successful!"
   ls "$BACKEND_SERVICE/geminiService.ts" 2>/dev/null || echo "Copy to backend failed."
 else
