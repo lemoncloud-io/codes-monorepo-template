@@ -26,6 +26,9 @@ importers:
       '@types/jest':
         specifier: ^27.5.0
         version: 27.5.2
+      '@types/mustache':
+        specifier: ^4.2.5
+        version: 4.2.6
       '@types/node':
         specifier: ^20.0.0
         version: 20.19.22
@@ -41,6 +44,9 @@ importers:
       lemon-devkit:
         specifier: ^0.0.6
         version: 0.0.6
+      mustache:
+        specifier: ^4.2.0
+        version: 4.2.0
       nodemon:
         specifier: ^2.0.20
         version: 2.0.22
@@ -1136,6 +1142,9 @@ packages:
 
   '@types/methods@1.1.4':
     resolution: {integrity: sha512-ymXWVrDiCxTBE3+RIrrP533E70eA+9qu7zdWoHuOmGujkYtzf4HQF96b8nwHLqhuf4ykX61IGRIB38CC6/sImQ==}
+
+  '@types/mustache@4.2.6':
+    resolution: {integrity: sha512-t+8/QWTAhOFlrF1IVZqKnMRJi84EgkIK5Kh0p2JV4OLywUvCwJPFxbJAl7XAow7DVIHsF+xW9f1MVzg0L6Szjw==}
 
   '@types/node@20.19.22':
     resolution: {integrity: sha512-hRnu+5qggKDSyWHlnmThnUqg62l29Aj/6vcYgUaSFL9oc7DVjeWEQN3PRgdSc6F8d9QRMWkf36CLMch1Do/+RQ==}
@@ -2385,6 +2394,10 @@ packages:
     resolution: {integrity: sha512-VzGiVigcG9zUAoCNU+xShztrlr1auZOlurXynNvO9GiWD1/mTBbUljOKY+qMeazBqXgRnjzeEgJI/wyjJUHg9A==}
     engines: {node: '>= 6.0.0'}
     deprecated: Multer 1.x is impacted by a number of vulnerabilities, which have been patched in 2.x. You should upgrade to the latest 2.x version.
+
+  mustache@4.2.0:
+    resolution: {integrity: sha512-71ippSywq5Yb7/tVYyGbkBggbU8H3u5Rz56fH60jGFgr8uHwxs+aSKeqmluIVzM0m0kB7xQjKS6qPfd0b2ZoqQ==}
+    hasBin: true
 
   nanoid@3.3.11:
     resolution: {integrity: sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w==}
@@ -5104,6 +5117,8 @@ snapshots:
 
   '@types/methods@1.1.4': {}
 
+  '@types/mustache@4.2.6': {}
+
   '@types/node@20.19.22':
     dependencies:
       undici-types: 6.21.0
@@ -6704,6 +6719,8 @@ snapshots:
       object-assign: 4.1.1
       type-is: 1.6.18
       xtend: 4.0.2
+
+  mustache@4.2.0: {}
 
   nanoid@3.3.11: {}
 

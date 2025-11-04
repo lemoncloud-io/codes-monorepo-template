@@ -8,11 +8,13 @@
  *
  * @copyright   (C) lemoncloud.io 2025 - All Rights Reserved. (https://eureka.codes)
  */
-import { $T, $U, _log, NextHandler, GeneralWEBController, NextContext } from 'lemon-core';
+import { $T, $U, _log, NextHandler, GeneralWEBController, NextContext, onlyDefined, loadJsonSync } from 'lemon-core';
 import { Model, TestModel } from '../service/model';
 import { HelloService } from '../service/service';
-import { generateBlogContent } from '../services/geminiService';
+import { generateContent } from '../services/genai';
+import { CodeContent, GenAIRequest } from '../services/genai-types';
 const NS = $U.NS('hello', 'yellow'); // NAMESPACE TO BE PRINTED.
+import fs from 'fs';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /**
@@ -112,7 +114,6 @@ export class HelloAPIController extends GeneralWEBController {
         const errScope = `doPost(${this.type()}/${id ?? ''})`;
         _log(NS, `${errScope} ...`);
         if (id == 'echo') return this.doPostEcho('0', param, body, context);
-        if (id && param.cmd === 'generate') return this.doPostGenerate(id, param, body, context);
 
         //* append into array.
         _log(NS, errScope);
@@ -164,24 +165,96 @@ export class HelloAPIController extends GeneralWEBController {
         return this.modelAsView(node);
     };
 
+    /** load the prompts and codes to use */
+    public load$ = (id: string, options?: { errScope?: string }) => {
+        const errScope = options?.errScope ?? `load$(${this.type()}/${id ?? ''})`;
+        _log(NS, `${errScope} ...`);
+        if (!id) throw new Error(`@id (string) is required - ${errScope}`);
+
+        const _prompt = (type: string): CodeContent[] => {
+            const $prompt = loadJsonSync(`../../data/${type}-prompt.json`);
+            if (type === 'system') {
+                const content = [{ content: $prompt.genaiBackend.join('\n') }];
+                return content;
+            } else if (type === 'user') {
+                const content = [
+                    { content: $prompt.genaiBackend1.join('\n') },
+                    { content: $prompt.genaiBackend2.join('\n') },
+                ];
+                return content;
+            }
+        };
+
+        const _code = (id: string): CodeContent => {
+            if (id === 'geminiService') {
+                const serviceFile = 'src/services/geminiService.ts';
+                const serviceCode = fs.existsSync(serviceFile) && fs.readFileSync(serviceFile, 'utf-8').toString();
+                return { id, content: serviceCode };
+            } else if (id === 'types') {
+                const typeFile = 'src/services/types.ts';
+                const typeCode = fs.existsSync(typeFile) && fs.readFileSync(typeFile, 'utf-8').toString();
+                return { id, content: typeCode };
+            } else if (id === 'api') {
+                const apiFile = 'src/api/hello-api.ts';
+                const apiCode = fs.existsSync(apiFile) && fs.readFileSync(apiFile, 'utf-8').toString();
+                return { id, content: apiCode };
+            }
+        };
+
+        const [$prompt, $userPrompt] = [_prompt('system'), _prompt('user')];
+        const $code = [_code('geminiService'), _code('types'), _code('api')];
+        console.log($userPrompt);
+
+        // returns.
+        return { $prompt, $userPrompt, $code };
+    };
+
+    /** refactoring local file */
+    public refact$ = (file: string, data?: CodeContent, options?: { errScope?: string }) => {
+        const errScope = options?.errScope ?? `refact$(${this.type()}/${file ?? ''})`;
+        _log(NS, `${errScope} ...`);
+        if (!data?.content) return;
+        if (!file) throw new Error(`@file (string) is required - ${errScope}`);
+
+        return fs.writeFileSync(file, data?.content, { encoding: 'utf-8', flag: 'w' });
+    };
+
     /**
-     * Generate content using Gemini API.
+     *
+     * Code refactor using Gemini API.
      *
      * ```sh
-     * $ http POST ':8000/hello/ai-blog-title-generator/generate' keyword='Next.js'
+     * # STEP 1 & 2
+     * $ http POST ':8000/hello/ai-blog-title-generator/refactor'
+     * $ http POST ':8000/hello/ai-blog-title-generator/refactor' model='gemini-2.5-pro'
      */
-    public doPostGenerate: NextHandler = async (id, param, body, context) => {
-        const errScope = `doPostGenerate(${this.type()}/${id ?? ''})`;
-        _log(NS, `${errScope} ...`);
+    public doPostRefactor: NextHandler = async (id, param, body, $ctx) => {
+        const errScope = `doPostRefactor(${this.type()}/${id ?? ''})`;
+        body && _log(NS, `> body =`, $U.json(body));
+        $ctx && _log(NS, `> context =`, $U.json($ctx));
+        id = id === '0' ? '' : $T.S2(id);
+        if (!id) throw new Error(`@id (string) is required - ${errScope}`);
 
-        if (id === 'ai-blog-title-generator') {
-            const { keyword } = body;
-            if (!keyword) throw new Error('`keyword` is required.');
-            const $param = { keyword };
-            return await generateBlogContent($param);
-        }
+        const $model = body?.model ?? 'gemini-2.5-pro';
 
-        throw new Error(`404 NOT FOUND - id:${id}`);
+        // load the prompts and codes from file.
+        const { $prompt, $userPrompt, $code } = this.load$(id, { errScope });
+
+        // generate the content with system and user prompts.
+        // const genai = new GenAIService();
+        const $req = onlyDefined<GenAIRequest>({ system: $prompt, user: $userPrompt, code: $code, appName: id });
+        const $service = await generateContent({ model: $model }, $req, { step: 1 });
+        const $api = await generateContent(
+            { model: $model },
+            { ...$req, histories: $service?.output },
+            { step: 2 },
+        );
+        const output = { $service, $api };
+
+        this.refact$('src/services/geminiService.ts', $service?.output, { errScope });
+        this.refact$('src/api/hello-api-00.ts', $api?.output, { errScope });
+
+        return { output };
     };
 }
 
