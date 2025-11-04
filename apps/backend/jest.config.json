@@ -16,5 +16,9 @@
     "transform": {
         "^.+\\.(ts|tsx|js|jsx)$": "ts-jest"
     },
+  "moduleNameMapper": {
+    "^@shared$": "<rootDir>/shared/index.ts",
+    "^@shared/(.*)$": "<rootDir>/shared/$1"
+  },
     "preset": "ts-jest/presets/js-with-ts"
 }
