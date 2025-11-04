@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { HelloWorldResponse } from '@shared';
 
-const API_URL = (window.API_URL || import.meta.env.VITE_API_URL || 'http://localhost:8000');
+const API_URL = ((window as any).API_URL || import.meta.env.VITE_API_URL || 'http://localhost:8000');
 
 const App = () => {
   const [data, setData] = useState<HelloWorldResponse | null>(null);
@@ -12,7 +12,7 @@ const App = () => {
     setLoading(true);
     setError('');
     try {
-      const response = await fetch(`${API_URL}/hello`);
+      const response = await fetch(`${API_URL}/hello/0`);
       const result: HelloWorldResponse = await response.json();
       setData(result);
     } catch (err) {

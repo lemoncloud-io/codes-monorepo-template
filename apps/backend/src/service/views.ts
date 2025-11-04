@@ -10,15 +10,12 @@
  */
 import { View, Body } from 'lemon-model';
 import { TestModel } from './model';
-import $LUT from './types';
 
-//! export all internal types
-export * from './types';
-export default $LUT;
 /**
  * Type `TestBody`
  */
 export interface TestBody extends Body, Partial<TestView> {}
+
 /**
  * type: `TestView`
  * - usually same as post's body.
