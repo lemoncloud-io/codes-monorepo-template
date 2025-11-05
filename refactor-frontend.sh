@@ -7,7 +7,7 @@
 set -e  # 오류 발생 시 즉시 종료
 
 # move into refactor directory
-cd ./refactor
+pushd ./refactor
 
 # Define the log file path
 LOG_DIR="../refactor/logs"
@@ -29,5 +29,4 @@ echo "[1/2] Running refactor.ts for frontend code..."
 npx ts-node refactor.ts frontend 2>&1 | tee -a "$LOG_FILE"
 
 echo "Code refactoring completed."
-
-cd ..
+popd

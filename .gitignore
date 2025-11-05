@@ -40,8 +40,3 @@ Thumbs.db
 
 # AI
 .claude
-
-# refactoring
-apps/backend/src/services/geminiService.ts
-apps/backend/src/services/types.ts
-apps/frontend/src/types.ts
