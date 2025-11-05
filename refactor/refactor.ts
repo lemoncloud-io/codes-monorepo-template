@@ -25,6 +25,15 @@ async function refactorCode(args: string[]) {
 
   console.log(`Starting code refactoring for step[${runType}/${runStep}] ...`);
 
+  //* for test.
+  // if (runType == 'backend'){
+  //   const result = await $fs.readFile('sample/result-backend.yml');
+  //   console.log("==================================================");
+  //   const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+  //   console.log($fs.parseResult(text));
+  //   return;
+  // }
+
   try {
     // --- 프롬프트 설정 ---
     const SYSTEM_PROMPT = await $fs.readFile(`${runType}/SYSTEM.md`);
@@ -67,9 +76,12 @@ async function refactorCode(args: string[]) {
     console.log(resultCode);
 
     // 파일 저장.
-    if (typeof resultCode === 'string' && runStep){
+    if (!resultCode) {
+      throw new Error("리팩토링된 코드가 없습니다.");
+    } else if (typeof resultCode === 'string' && runStep) {
       if (runStep === 1) await $fs.saveCode('serviceCode', resultCode);
       else if (runStep === 2) await $fs.saveCode('apiCode', resultCode);
+      else throw new Error(`Unknown runStep: ${runStep}`);
     } else if (typeof resultCode === 'object') {
       if (resultCode.serviceCode) await $fs.saveCode('serviceCode', resultCode.serviceCode);
       if (resultCode.typeCode) await $fs.saveCode('typeCode', resultCode.typeCode);

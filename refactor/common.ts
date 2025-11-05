@@ -8,7 +8,7 @@ import { GoogleGenAI } from "@google/genai";
 import * as fs from "fs/promises";
 import * as path from "path";
 import "dotenv/config"; // API 키를 .env 파일에서 로드
-import { asYml } from "./lib/yml";
+import { asYml, fromYml } from "./lib/yml";
 
 // Factory 함수로 Gemini AI 인스턴스 생성
 export const $ai = ((API_KEY: string) => {
@@ -22,13 +22,20 @@ export const $ai = ((API_KEY: string) => {
 // --- 파일 입출력 유틸리티 ---
 export const $fs = ((_baseRoot: string) => {
   /** read file */
-  const readFile = async (filePath: string, baseRoot = _baseRoot) => {
+  const readFile = async <T = any>(filePath: string, baseRoot = _baseRoot): Promise<T> => {
     filePath = baseRoot ? path.join(baseRoot, filePath) : filePath;
     filePath = path.resolve(filePath);
-    if (!(await fs.stat(filePath)).isFile()) {
-      throw new Error(`File not found: ${filePath}`);
+    if (!(await fs.stat(filePath)).isFile()) throw new Error(`File not found: ${filePath}`);
+
+    const content = await fs.readFile(filePath, "utf-8");
+    if (typeof content === "string" && filePath.endsWith(".yml")) {
+      const res = fromYml<object>(content);
+      return res as unknown as T;
     }
-    return fs.readFile(filePath, "utf-8");
+    if (typeof content === "string" && content.startsWith("{") && content.endsWith("}")) {
+      return JSON.parse(content) as T;
+    }
+    return content as unknown as T;
   };
 
   /** save file */
@@ -39,7 +46,8 @@ export const $fs = ((_baseRoot: string) => {
   ) => {
     filePath = baseRoot ? path.join(baseRoot, filePath) : filePath;
     filePath = path.resolve(filePath);
-    if (typeof content === "object") content = asYml(content);
+    if (typeof content === "object" && filePath?.endsWith(".yml")) content = asYml(content);
+    else if (typeof content === "object") content = JSON.stringify(content, null, 2);
 
     if (!(await fs.lstat(path.dirname(filePath))).isDirectory())
       await fs.mkdir(path.dirname(filePath), { recursive: true });
@@ -57,6 +65,9 @@ export const $fs = ((_baseRoot: string) => {
   };
 
   type FileName = keyof typeof fileMap;
+  const asFileName = (file: string): FileName => {
+    return Object.entries(fileMap).find(([_, v]) => v === file)?.[0] as FileName;
+  };
   const loadCode = async (name: FileName, baseRoot = _baseRoot) => {
     const filePath = fileMap[name];
     return readFile(filePath, path.join(baseRoot, ".."));
@@ -68,10 +79,31 @@ export const $fs = ((_baseRoot: string) => {
   ) => {
     const filePath = fileMap[name];
     const fullPath = path.resolve(path.join(baseRoot, "..", filePath));
+    console.log(`>> Saving code[${name}] to`, fullPath);
     await fs.writeFile(fullPath, content, "utf-8");
   };
 
   const parseResult = (txt: any) => {
+
+    if (typeof txt !== "string") return null;
+    if (txt.startsWith('@apps/')){
+      const arr = txt.split('@apps/').map(part => `@apps/${part}`).map(s => {
+        const i = s.indexOf('\n');
+        if (i === -1 || !s) return { file: null, content: s.trim() };
+        const file = s.substring(1, i).trim();
+        const content = parseResult(s.substring(i).trim());
+        return { file, content };
+      });
+      const result: Record<FileName, string> = {};
+      for (const item of arr){
+        if (item?.file) {
+          const itemFileName = asFileName(item.file);
+          result[itemFileName] = item.content as string;
+        }
+      }
+      return result;
+    }
+
     try {
       const match =
         typeof txt === "string"
