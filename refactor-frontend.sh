@@ -1,5 +1,5 @@
 #!/bin/bash
-# backend-backend.sh
+# backend-frontend.sh
 # - 이 스크립트는 백엔드 코드 리팩토링을 준비하기 위한 사전 단계를 수행합니다.
 # - 사용법: ./refactor-prep.sh <name-in-sample-app>
 # - 예시: ./refactor-prep.sh ai-blog-title-generator
@@ -11,7 +11,7 @@ cd ./refactor
 
 # Define the log file path
 LOG_DIR="../refactor/logs"
-LOG_FILE="${LOG_DIR}/refactor-backend.log"
+LOG_FILE="${LOG_DIR}/refactor-frontend.log"
 
 # Create the log directory if it doesn't exist (forcibly)
 mkdir -p "$LOG_DIR"
@@ -20,13 +20,13 @@ mkdir -p "$LOG_DIR"
 # The 'tee' command also prints to the console while writing to the file
 exec > >(tee -a "$LOG_FILE") 2>&1
 
-echo "Starting steps for backend code refactoring..."
+echo "Starting steps for frontend code refactoring..."
 
 # 리팩토링 스크립트 실행
 # ----------------------------------------------------------
-echo "[1/2] Running refactor.ts for backend code..."
+echo "[1/2] Running refactor.ts for frontend code..."
 # npx ts-node refactor.ts 1 2>&1 | tee -a "$LOG_FILE"
-npx ts-node refactor.ts backend 2>&1 | tee -a "$LOG_FILE"
+npx ts-node refactor.ts frontend 2>&1 | tee -a "$LOG_FILE"
 
 echo "Code refactoring completed."
 
