@@ -10,9 +10,11 @@
   "dependencies": {
     "@google/genai": "^1.24.0",
     "dotenv": "^16.3.1",
+    "js-yaml": "^4.1.0",
     "mustache": "^4.2.0"
   },
   "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
     "@types/mustache": "^4.2.6",
     "@types/node": "^20.11.5",
     "ts-node": "^10.9.2",

@@ -3,85 +3,42 @@
  *
  * 사용법:
  * ```sh
- * # run step.1
+ * # run step.1 in `prompt` folder.
  * npx ts-node refactor.ts 1
+ *
+ * # run with `backend` folder.
+ * npx ts-node refactor.ts backend
  * ```
  */
-import { GoogleGenAI } from "@google/genai";
-import * as fs from "fs/promises";
-import * as path from "path";
 import "dotenv/config"; // API 키를 .env 파일에서 로드
 import mustache from "mustache";
-
-// Factory 함수로 Gemini AI 인스턴스 생성
-const $ai = ((API_KEY: string) => {
-  if (!process.env[API_KEY]) {
-    throw new Error(`${API_KEY} environment variable not set`);
-  }
-  const ai = new GoogleGenAI({ apiKey: process.env[API_KEY] });
-  return ai;
-})("GEMINI_API_KEY");
-
-/** read file */
-const readFile = async (filePath: string, baseRoot?: string) => {
-  filePath = baseRoot ? path.join(baseRoot, filePath) : filePath;
-  filePath = path.resolve(filePath);
-  if (!(await fs.stat(filePath)).isFile()) {
-    throw new Error(`File not found: ${filePath}`);
-  }
-  return fs.readFile(filePath, "utf-8");
-};
-
-const fileMap: Record<string, string> = {
-  serviceCode: "apps/backend/src/services/geminiService.ts",
-  typeCode: "apps/backend/src/services/types.ts",
-  apiCode: "apps/backend/src/api/hello-api.ts",
-};
-
-type FileName = keyof typeof fileMap;
-const loadCode = async (name: FileName) => {
-  const filePath = fileMap[name];
-  return readFile(filePath, path.join(__dirname, ".."));
-};
-const saveCode = async (name: FileName, content: string) => {
-  const filePath = fileMap[name];
-  const fullPath = path.resolve(path.join(__dirname, "..", filePath));
-  await fs.writeFile(fullPath, content, "utf-8");
-};
+import { $ai, $fs } from "./common";
 
 // 메인 리팩토링 함수
 async function refactorCode(args: string[]) {
   // 2. CLI 입력 파라미터로 파일 경로 받기
-  const runStep = args[2];
-  if (!runStep || !/^[0-9]+$/.test(runStep))
-    throw new Error(
-      `리팩토링할 파일 경로를 입력해주세요. 예: ts-node refactor.ts 1 (입력: ${runStep})`
-    );
+  const param1 = args[2];
+  if (!param1) throw new Error(`리팩토링할 파일 경로를 입력해주세요. (입력: ${param1})`);
 
-  console.log(`Starting code refactoring for step[${runStep}] ...`);
-  // if (Number(runStep) >= 1 && Number(runStep) <= 3) {
-  //   return loadCode(['serviceCode', 'typeCode', 'apiCode'][Number(runStep) - 1] as any).then(code => console.log(code));
-  // }
+  const runType = /^[a-zA-Z][a-zA-Z0-9\-]*$/.test(param1) ? param1 : "prompt";
+  const runStep = /^[0-9]+$/.test(param1) ? Number(param1) : 0;
+
+  console.log(`Starting code refactoring for step[${runType}/${runStep}] ...`);
 
   try {
     // --- 프롬프트 설정 ---
-    const SYSTEM_PROMPT = await readFile("prompt/SYSTEM.md", __dirname);
-    const USER_PROMPT = await readFile(
-      `prompt/USER-STEP${runStep}.md`,
-      __dirname
-    );
+    const SYSTEM_PROMPT = await $fs.readFile(`${runType}/SYSTEM.md`);
+    const USER_PROMPT = await $fs.readFile(`${runType}/` + (runStep ? `USER-STEP${runStep}.md` : `USER.md`));
     const [serviceCode, typeCode, apiCode] = await Promise.all([
-      loadCode("serviceCode"),
-      loadCode("typeCode"),
-      loadCode("apiCode"),
+      $fs.loadCode("serviceCode"),
+      $fs.loadCode("typeCode"),
+      $fs.loadCode("apiCode"),
     ]);
     const prompt = mustache.render(USER_PROMPT, {
       serviceCode,
       typeCode,
       apiCode,
     });
-
-    // if (prompt) return console.log(prompt);
 
     console.log("🤖 Gemini에게 코드 리팩토링을 요청합니다...");
     console.log("==================================================");
@@ -99,35 +56,9 @@ async function refactorCode(args: string[]) {
     });
 
     // 6. 호출 결과
+    $fs.saveFile(`logs/result-${runType}${runStep ? '-' + runStep : ''}.yml`, result);
     const jsonString = result?.text?.trim();
-    const _parseJson = (txt: any) => {
-      try {
-        const match =
-          typeof txt === "string"
-            ? txt.match(/^```(?:typescript|ts)?\s*\n?([\s\S]*?\n?)```[\s\n]*$/)
-            : null;
-        if (match) {
-          txt = match[1];
-          return txt;
-        } else if (
-          typeof txt === "string" &&
-          txt.startsWith("```") &&
-          txt.endsWith("```")
-        ) {
-          const lines = txt.split("\n");
-          lines.shift(); // 첫 번째 줄 제거 (```typescript)
-          lines.pop(); // 마지막 줄 제거 (```)
-          txt = lines.join("\n").trim();
-          return txt;
-        }
-        return JSON.parse(txt || "");
-      } catch (e) {
-        console.log(jsonString);
-        console.error("! JSON 파싱 오류:", e);
-        return null;
-      }
-    };
-    const resultCode = _parseJson(jsonString);
+    const resultCode = $fs.parseResult(jsonString);
 
     // 6. 결과 출력
     console.log("---------------------------------------------------");
@@ -136,8 +67,14 @@ async function refactorCode(args: string[]) {
     console.log(resultCode);
 
     // 파일 저장.
-    if (runStep === "1") await saveCode('serviceCode', resultCode);
-    else if (runStep === "2") await saveCode('apiCode', resultCode);
+    if (typeof resultCode === 'string' && runStep){
+      if (runStep === 1) await $fs.saveCode('serviceCode', resultCode);
+      else if (runStep === 2) await $fs.saveCode('apiCode', resultCode);
+    } else if (typeof resultCode === 'object') {
+      if (resultCode.serviceCode) await $fs.saveCode('serviceCode', resultCode.serviceCode);
+      if (resultCode.typeCode) await $fs.saveCode('typeCode', resultCode.typeCode);
+      if (resultCode.apiCode) await $fs.saveCode('apiCode', resultCode.apiCode);
+    }
 
   } catch (error) {
     if (error instanceof Error && "code" in error && error.code === "ENOENT") {

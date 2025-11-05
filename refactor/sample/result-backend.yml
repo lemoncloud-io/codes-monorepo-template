@@ -1,0 +1,220 @@
+sdkHttpResponse:
+  headers:
+    alt-svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+    content-encoding: gzip
+    content-type: application/json; charset=UTF-8
+    date: Wed, 05 Nov 2025 05:31:46 GMT
+    server: scaffolding on HTTPServer2
+    server-timing: gfet4t7; dur=39208
+    transfer-encoding: chunked
+    vary: Origin, X-Origin, Referer
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-xss-protection: '0'
+candidates:
+  - content:
+      parts:
+        - text: >-
+            @apps/backend/src/services/geminiService.ts
+
+            ```typescript
+
+            import { GoogleGenAI, Type } from "@google/genai";
+
+            import type { GeneratedContent } from './types';
+
+
+            if (!process.env.API_KEY) {
+              throw new Error("API_KEY environment variable not set");
+            }
+
+
+            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
+
+            const responseSchema = {
+              type: Type.OBJECT,
+              properties: {
+                titles: {
+                  type: Type.ARRAY,
+                  items: { type: Type.STRING },
+                  description: "Generated blog titles"
+                },
+                tags: {
+                  type: Type.ARRAY,
+                  items: { type: Type.STRING },
+                  description: "Generated blog tags"
+                }
+              },
+              required: ["titles", "tags"],
+            };
+
+
+            export async function generateBlogContent($param: { keyword: string
+            }): Promise<GeneratedContent> {
+              const prompt = `'${$param?.keyword}'라는 키워드에 대한 블로그 포스팅 제목 5개와 관련 태그 10개를 생성해줘. 제목은 사람들의 클릭을 유도할 수 있도록 흥미롭고 창의적으로 만들어줘. 태그는 검색에 유리하도록 핵심적인 내용으로 구성해줘. 결과는 JSON 형식으로 반환해줘.`;
+
+              try {
+                const response = await ai.models.generateContent({
+                  model: "gemini-2.5-flash",
+                  contents: prompt,
+                  config: {
+                    responseMimeType: "application/json",
+                    responseSchema: responseSchema,
+                    temperature: 0.8,
+                    topP: 0.95,
+                  },
+                });
+
+                const jsonString = response.text.trim();
+                const parsedJson = JSON.parse(jsonString);
+
+                // Basic validation
+                if (parsedJson && Array.isArray(parsedJson.titles) && Array.isArray(parsedJson.tags)) {
+                  return parsedJson as GeneratedContent;
+                } else {
+                  throw new Error("Invalid JSON structure received from API.");
+                }
+
+              } catch (error) {
+                console.error("Error generating content:", error);
+                throw new Error("Failed to generate content from Gemini API.");
+              }
+            }
+
+            ```
+
+            @apps/backend/src/api/hello-api.ts
+
+            ```typescript
+
+            /**
+             * `hello-api.ts`
+             * - service endpoint for `/hello`
+             *
+             *
+             * @author      Steve Jung <steve@lemoncloud.io>
+             * @date        2025-10-10 initial version with `lemon-core#4.0.7`
+             *
+             * @copyright   (C) lemoncloud.io 2025 - All Rights Reserved. (https://eureka.codes)
+             */
+            import { View, CoreModel } from 'lemon-model';
+
+            import { $T, $U, _log, NextHandler, GeneralWEBController } from
+            'lemon-core';
+
+            import { TestView } from '../service/views';
+
+            import $service, { HelloService } from '../service/service';
+
+            import { generateBlogContent } from '../services/geminiService';
+
+            const NS = $U.NS('hello', 'yellow'); // NAMESPACE TO BE PRINTED.
+
+
+            /* eslint-disable @typescript-eslint/no-unused-vars */
+
+            /**
+             * class: `HelloAPIController`
+             * - handle of `/hello` type
+             *
+             * support basic CRUD operations.
+             * - GET    /hello         => list-all
+             * - GET    /hello/:id     => get-one
+             * - POST   /hello/:id     => create-new (at position :id)
+             * - PUT    /hello/:id     => update-existing (at position :id)
+             * - DELETE /hello/:id     => delete-existing (at position :id)
+             * - GET    /hello/:id/say => get-one with say command.
+             */
+            export class HelloAPIController extends GeneralWEBController {
+                /**
+                 * default constructor.
+                 */
+                public constructor(readonly service: HelloService = $service) {
+                    super('hello');
+                    _log(NS, `HelloAPIController()...`);
+                }
+
+                /**
+                 * name of this resource.
+                 */
+                public hello = () => `hello-api-controller:${this.type()}`;
+
+                /**
+                 * transform from model to view.
+                 */
+                public modelAsView = <V extends View, M = CoreModel<any>>(model: M) => $U.cleanup({ ...model }) as V;
+
+                /**
+                 * list hello
+                 *
+                 * ```sh
+                 * $ http ':8000/hello'
+                 */
+                public doList: NextHandler = async (id, param, body, context) => {
+                    const errScope = `doList(${this.type()}/${id ?? ''})`;
+                    _log(NS, `${errScope} ...`);
+                    throw new Error(`NOT IMPLEMENTED - ${errScope}`);
+                };
+
+                /**
+                 * get hello hello
+                 *
+                 * ```sh
+                 * $ http ':8000/hello/0'
+                 * $ http ':8000/hello/abc'
+                 */
+                public doGet: NextHandler = async (id, param, body, context) => {
+                    const errScope = `doGet(${this.type()}/${id ?? ''})`;
+                    _log(NS, `${errScope} ...`);
+                    id = id === '0' ? '' : $T.S2(id);
+                    if (!id) return { message: this.hello(), timestamp: $U.ts() };
+
+                    //* read from database.
+                    if (/^[a-zA-Z]+$/.test(id)) {
+                        const model = await this.service.$test.retrieve(id);
+                        if (!model?.id) throw new Error(`404 NOT FOUND - invalid id[${id}] @${errScope}`);
+                        return this.modelAsView<TestView>(model);
+                    }
+
+                    // otherwise, error.
+                    throw new Error(`@id[${id}] is invalid - ${errScope}`);
+                };
+
+                /**
+                 * POST /hello/:id/generate
+                 */
+                public doPostGenerate: NextHandler = async (id, param, body, context) => {
+                    const errScope = `doPostGenerate(${this.type()}/${id ?? ''})`;
+                    _log(NS, `${errScope} ...`);
+
+                    if (id === 'generate-blog-content') {
+                        const { keyword } = body;
+                        if (!keyword) throw new Error('400 BAD REQUEST - `keyword` is required.');
+                        const $param = { keyword };
+                        return generateBlogContent($param);
+                    }
+
+                    throw new Error(`404 NOT FOUND - unsupported operation for id[${id}]`);
+                };
+            }
+
+
+            //*export as default.
+
+            export default new HelloAPIController();
+
+            ```
+      role: model
+    finishReason: STOP
+    index: 0
+modelVersion: gemini-2.5-pro
+responseId: QuEKabaMLM7C0-kPkcTOkQQ
+usageMetadata:
+  promptTokenCount: 2563
+  candidatesTokenCount: 1577
+  totalTokenCount: 8391
+  promptTokensDetails:
+    - modality: TEXT
+      tokenCount: 2563
+  thoughtsTokenCount: 4251

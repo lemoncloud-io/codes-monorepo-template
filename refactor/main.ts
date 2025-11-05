@@ -10,6 +10,7 @@ import { GoogleGenAI } from "@google/genai";
 import * as fs from "fs/promises";
 import * as path from "path";
 import "dotenv/config"; // API 키를 .env 파일에서 로드
+import { asYml } from "./lib/yml";
 
 // Factory 함수로 Gemini AI 인스턴스 생성
 const $ai = ((API_KEY: string) => {
@@ -20,6 +21,17 @@ const $ai = ((API_KEY: string) => {
     return ai;
 })('GEMINI_API_KEY');
 
+/** save file */
+const saveFile = async (filePath: string, content: string | object, baseRoot?: string) => {
+  filePath = baseRoot ? path.join(baseRoot, filePath) : filePath;
+  filePath = path.resolve(filePath);
+  if (typeof content === "object") content = asYml(content);
+
+  if (!(await fs.lstat(path.dirname(filePath))).isDirectory())
+    await fs.mkdir(path.dirname(filePath), { recursive: true });
+
+  return fs.writeFile(filePath, content, "utf-8");
+};
 
 // --- 프롬프트 설정 ---
 // 추가적인 시스템 레벨의 지시사항을 설정할 수 있습니다.
@@ -73,6 +85,7 @@ ${codeToRefactor}
     });
 
     // 6. 호출 결과
+    saveFile('logs/main-response.yml', result);
     const jsonString = result?.text?.trim();
     const _parseJson = (txt: any) => {
         try {
