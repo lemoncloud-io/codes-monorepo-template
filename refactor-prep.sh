@@ -20,8 +20,10 @@ APP_DIR="sample/$APP_NAME"
 APP_SERVICES="$APP_DIR/services"
 APP_TYPES="$APP_DIR/types.ts"
 BACKEND_SERVICES="$BACKEND_DIR/src/services"
+
 FRONTEN_DIR="apps/frontend"
-FRONTEN_SERVICES="$FRONTEN_DIR/src"
+FRONTEN_SOURCE="$FRONTEN_DIR/src"
+FRONTEN_SERVICES="$FRONTEN_DIR/src/services"
 
 # 1. package.json 수정 맟 설치
 # ----------------------------------------------------------
@@ -38,8 +40,10 @@ echo "[2/4] Copying geminiService.ts file..."
 
 if [ -f "$APP_SERVICES/geminiService.ts" ]; then
   cp -rf "$APP_SERVICES/" "./$BACKEND_SERVICES/"
+  cp -rf "$APP_SERVICES/" "./$FRONTEN_SERVICES/"
   echo "Copy gemini service file successful!"
   ls "$BACKEND_SERVICE/geminiService.ts" 2>/dev/null || echo "Copy to backend failed."
+  ls "$FRONTEN_SERVICES/geminiService.ts" 2>/dev/null || echo "Copy to frontend failed."
 else
   echo "Gemini Service file not exist → $APP_SERVICES"
 fi
@@ -50,12 +54,52 @@ echo "[3/4] Copying types.ts file..."
 
 if [ -f "$APP_TYPES" ]; then
   cp "$APP_TYPES" "./$BACKEND_SERVICES/types.ts"
-  cp "$APP_TYPES" "./$FRONTEN_SERVICES/types.ts"
   echo "Copy types file successful! (backend, frontend)"
   ls "$BACKEND_SERVICE/types.ts" 2>/dev/null || echo "Copy to backend failed."
-  ls "$FRONTEN_SERVICES/types.ts" 2>/dev/null || echo "Copy to frontend failed."
 else
   echo "Types file not exist → $APP_SERVICES"
+fi
+
+
+# 3. types.ts 파일 복사
+# ----------------------------------------------------------
+echo "[4/4] Copying frontend file..."
+
+if [ -d "$APP_DIR/components" ]; then
+  cp -rf "$APP_DIR/components/" "./$FRONTEN_SOURCE/components/"
+  echo "Copy components folder successful!"
+  ls "$FRONTEN_SOURCE/components" 2>/dev/null || echo "WARN! Copy to frontend/components failed."
+fi
+if [ -d "$APP_DIR/services" ]; then
+  cp -rf "$APP_DIR/services/" "./$FRONTEN_SOURCE/services/"
+  echo "Copy services folder successful!"
+  ls "$FRONTEN_SOURCE/services" 2>/dev/null || echo "WARN! Copy to frontend/services failed."
+fi
+if [ -f "$APP_DIR/App.tsx" ]; then
+  cp -rf "$APP_DIR/App.tsx" "./$FRONTEN_SOURCE/"
+  echo "Copy App.tsx successful!"
+  ls "$FRONTEN_SOURCE/App.tsx" 2>/dev/null || echo "Copy to frontend/App.tsx failed."
+fi
+if [ -f "$APP_DIR/index.tsx" ]; then
+  cp -rf "$APP_DIR/index.tsx" "./$FRONTEN_SOURCE/"
+  echo "Copy index.tsx successful!"
+  ls "$FRONTEN_SOURCE/index.tsx" 2>/dev/null || echo "WARN! Copy to frontend/index.tsx failed."
+fi
+if [ -f "$APP_DIR/index.html" ]; then
+  cp -rf "$APP_DIR/index.html" "./$FRONTEN_SOURCE/../index.html"
+  echo "Copy index.html successful!"
+  ls "$FRONTEN_SOURCE/../index.html" 2>/dev/null || echo "WARN! Copy to frontend/index.html failed."
+  sed -i '' 's#/index\.tsx#/src/index.tsx#g' "$FRONTEN_SOURCE/../index.html"
+fi
+if [ -f "$APP_DIR/types.ts" ]; then
+  cp -rf "$APP_DIR/types.ts" "./$FRONTEN_SOURCE/"
+  echo "Copy types.ts successful!"
+  ls "$FRONTEN_SOURCE/types.ts" 2>/dev/null || echo "WARN! Copy to frontend/types.ts failed."
+fi
+if [ -f "$APP_DIR/metadata.json" ]; then
+  cp -rf "$APP_DIR/metadata.json" "./$FRONTEN_SOURCE/"
+  echo "Copy metadata.json successful!"
+  ls "$FRONTEN_SOURCE/metadata.json" 2>/dev/null || echo "WARN! Copy to frontend/metadata.json failed."
 fi
 
 # 4. 필수 파일 존재 확인

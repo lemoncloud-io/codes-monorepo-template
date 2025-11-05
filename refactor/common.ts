@@ -11,16 +11,16 @@ import "dotenv/config"; // API 키를 .env 파일에서 로드
 import { asYml, fromYml } from "./lib/yml";
 
 // Factory 함수로 Gemini AI 인스턴스 생성
-export const $ai = ((API_KEY: string) => {
+export const $ai = (API_KEY: string) => {
   if (!process.env[API_KEY]) {
     throw new Error(`${API_KEY} environment variable not set`);
   }
   const ai = new GoogleGenAI({ apiKey: process.env[API_KEY] });
   return ai;
-})("GEMINI_API_KEY");
+};
 
-// --- 파일 입출력 유틸리티 ---
-export const $fs = ((_baseRoot: string) => {
+// Factory 함수로 파일 시스템 유틸리티 생성
+export const $fs = (scope: string, _baseRoot: string = __dirname) => {
   /** read file */
   const readFile = async <T = any>(filePath: string, baseRoot = _baseRoot): Promise<T> => {
     filePath = baseRoot ? path.join(baseRoot, filePath) : filePath;
@@ -63,6 +63,11 @@ export const $fs = ((_baseRoot: string) => {
     typeCode: "apps/backend/src/services/types.ts",
     apiCode: "apps/backend/src/api/hello-api.ts",
   };
+  if (scope == 'frontend'){
+    fileMap.serviceCode = "apps/frontend/src/services/geminiService.ts";
+    fileMap.typeCode = "apps/frontend/src/types.ts";
+    fileMap.apiCode = "";
+  }
 
   type FileName = keyof typeof fileMap;
   const asFileName = (file: string): FileName => {
@@ -70,6 +75,7 @@ export const $fs = ((_baseRoot: string) => {
   };
   const loadCode = async (name: FileName, baseRoot = _baseRoot) => {
     const filePath = fileMap[name];
+    if (!filePath) return '';
     return readFile(filePath, path.join(baseRoot, ".."));
   };
   const saveCode = async (
@@ -78,6 +84,7 @@ export const $fs = ((_baseRoot: string) => {
     baseRoot = _baseRoot
   ) => {
     const filePath = fileMap[name];
+    if (!filePath) throw new Error(`Unknown file name: ${name}`);
     const fullPath = path.resolve(path.join(baseRoot, "..", filePath));
     console.log(`>> Saving code[${name}] to`, fullPath);
     await fs.writeFile(fullPath, content, "utf-8");
@@ -133,4 +140,4 @@ export const $fs = ((_baseRoot: string) => {
 
   // export.
   return { readFile, saveFile, loadCode, saveCode, parseResult };
-})(__dirname);
+};

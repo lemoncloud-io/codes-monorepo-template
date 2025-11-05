@@ -22,12 +22,15 @@ async function refactorCode(args: string[]) {
 
   const runType = /^[a-zA-Z][a-zA-Z0-9\-]*$/.test(param1) ? param1 : "prompt";
   const runStep = /^[0-9]+$/.test(param1) ? Number(param1) : 0;
-
+  
   console.log(`Starting code refactoring for step[${runType}/${runStep}] ...`);
+
+  const ai = $ai("GEMINI_API_KEY");
+  const fs = $fs(runType);
 
   //* for test.
   // if (runType == 'backend'){
-  //   const result = await $fs.readFile('sample/result-backend.yml');
+  //   const result = await fs.readFile('sample/result-backend.yml');
   //   console.log("==================================================");
   //   const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
   //   console.log($fs.parseResult(text));
@@ -36,24 +39,25 @@ async function refactorCode(args: string[]) {
 
   try {
     // --- 프롬프트 설정 ---
-    const SYSTEM_PROMPT = await $fs.readFile(`${runType}/SYSTEM.md`);
-    const USER_PROMPT = await $fs.readFile(`${runType}/` + (runStep ? `USER-STEP${runStep}.md` : `USER.md`));
+    const SYSTEM_PROMPT = await fs.readFile(`${runType}/SYSTEM.md`);
+    const USER_PROMPT = await fs.readFile(`${runType}/` + (runStep ? `USER-STEP${runStep}.md` : `USER.md`));
     const [serviceCode, typeCode, apiCode] = await Promise.all([
-      $fs.loadCode("serviceCode"),
-      $fs.loadCode("typeCode"),
-      $fs.loadCode("apiCode"),
+      fs.loadCode("serviceCode"),
+      fs.loadCode("typeCode"),
+      fs.loadCode("apiCode"),
     ]);
     const prompt = mustache.render(USER_PROMPT, {
       serviceCode,
       typeCode,
       apiCode,
     });
+    // if (runType) return console.log(prompt);
 
     console.log("🤖 Gemini에게 코드 리팩토링을 요청합니다...");
     console.log("==================================================");
 
     // 5. Gemini API 호출
-    const result = await $ai.models.generateContent({
+    const result = await ai.models.generateContent({
       model: 1 ? "gemini-2.5-pro" : "gemini-pro",
       contents: prompt,
       config: {
@@ -65,9 +69,9 @@ async function refactorCode(args: string[]) {
     });
 
     // 6. 호출 결과
-    $fs.saveFile(`logs/result-${runType}${runStep ? '-' + runStep : ''}.yml`, result);
+    fs.saveFile(`logs/result-${runType}${runStep ? '-' + runStep : ''}.yml`, result);
     const jsonString = result?.text?.trim();
-    const resultCode = $fs.parseResult(jsonString);
+    const resultCode = fs.parseResult(jsonString);
 
     // 6. 결과 출력
     console.log("---------------------------------------------------");
@@ -79,13 +83,13 @@ async function refactorCode(args: string[]) {
     if (!resultCode) {
       throw new Error("리팩토링된 코드가 없습니다.");
     } else if (typeof resultCode === 'string' && runStep) {
-      if (runStep === 1) await $fs.saveCode('serviceCode', resultCode);
-      else if (runStep === 2) await $fs.saveCode('apiCode', resultCode);
+      if (runStep === 1) await fs.saveCode('serviceCode', resultCode);
+      else if (runStep === 2) await fs.saveCode('apiCode', resultCode);
       else throw new Error(`Unknown runStep: ${runStep}`);
     } else if (typeof resultCode === 'object') {
-      if (resultCode.serviceCode) await $fs.saveCode('serviceCode', resultCode.serviceCode);
-      if (resultCode.typeCode) await $fs.saveCode('typeCode', resultCode.typeCode);
-      if (resultCode.apiCode) await $fs.saveCode('apiCode', resultCode.apiCode);
+      if (resultCode.serviceCode) await fs.saveCode('serviceCode', resultCode.serviceCode);
+      if (resultCode.typeCode) await fs.saveCode('typeCode', resultCode.typeCode);
+      if (resultCode.apiCode) await fs.saveCode('apiCode', resultCode.apiCode);
     }
 
   } catch (error) {
