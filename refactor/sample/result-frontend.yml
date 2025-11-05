@@ -1,0 +1,47 @@
+sdkHttpResponse:
+  headers:
+    alt-svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+    content-encoding: gzip
+    content-type: application/json; charset=UTF-8
+    date: Wed, 05 Nov 2025 08:42:30 GMT
+    server: scaffolding on HTTPServer2
+    server-timing: gfet4t7; dur=31932
+    transfer-encoding: chunked
+    vary: Origin, X-Origin, Referer
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-xss-protection: '0'
+candidates:
+  - content:
+      parts:
+        - text: >-
+            @apps/frontend/src/services/geminiService.ts
+
+            ```typescript
+
+            import apiClient from '../api/axios';
+
+            import type { GeneratedContent } from '../types';
+
+
+            export async function generateBlogContent(keyword: string):
+            Promise<GeneratedContent> {
+              const $param = { keyword };
+              const response = await apiClient.post<GeneratedContent>('/hello/generate-blog-content/generate', $param);
+              return response.data;
+            }
+
+            ```
+      role: model
+    finishReason: STOP
+    index: 0
+modelVersion: gemini-2.5-pro
+responseId: 9Q0LafDXNpWw1e8P9vHQwQg
+usageMetadata:
+  promptTokenCount: 1953
+  candidatesTokenCount: 102
+  totalTokenCount: 6136
+  promptTokensDetails:
+    - modality: TEXT
+      tokenCount: 1953
+  thoughtsTokenCount: 4081
