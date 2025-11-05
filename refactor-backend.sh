@@ -25,11 +25,9 @@ echo "Starting steps for backend code refactoring..."
 # 리팩토링 스크립트 실행
 # ----------------------------------------------------------
 echo "[1/2] Running refactor.ts for backend code..."
-npx ts-node refactor.ts 1 2>&1 | tee -a "$LOG_FILE"
+# npx ts-node refactor.ts 1 2>&1 | tee -a "$LOG_FILE"
+npx ts-node refactor.ts backend 2>&1 | tee -a "$LOG_FILE"
 
-echo "[2/2] Running refactor.ts for backend code..."
-npx ts-node refactor.ts 2 2>&1 | tee -a "$LOG_FILE"
-
-echo "Backend code refactoring completed."
+echo "Code refactoring completed."
 
 cd ..
