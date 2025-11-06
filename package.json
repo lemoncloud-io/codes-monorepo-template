@@ -1,0 +1,13 @@
+{
+    "name": "codes-monorepo-template",
+    "version": "0.0.0",
+    "description": "Simplified monorepo for code samples using LemonCore",
+    "scripts": {
+        "backend": "cd apps/backend && npm run dev",
+        "frontend": "cd apps/frontend && npm run dev",
+        "deploy": "echo NOT supported yet!"
+    },
+    "author": "Steve Jung <steve@lemoncloud.io> (https://eureka.codes)",
+    "license": "ISC",
+    "private": false
+}

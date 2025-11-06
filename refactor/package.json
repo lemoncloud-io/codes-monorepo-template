@@ -1,0 +1,23 @@
+{
+  "name": "gemini-refactor-sample",
+  "version": "1.0.0",
+  "description": "Code refactoring sample using Gemini SDK",
+  "main": "dist/refactor.js",
+  "scripts": {
+    "start": "ts-node refactor.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@google/genai": "^1.24.0",
+    "dotenv": "^16.3.1",
+    "js-yaml": "^4.1.0",
+    "mustache": "^4.2.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/mustache": "^4.2.6",
+    "@types/node": "^20.11.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}

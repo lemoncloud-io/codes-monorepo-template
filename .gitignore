@@ -1,6 +1,10 @@
 # Dependencies
 node_modules/
 
+# sample files but not zip files
+sample/**
+!sample/*.zip
+
 # Build outputs
 dist/
 build/

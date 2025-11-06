@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
-import { HelloWorldResponse } from '@shared';
+import apiClient, { API_URL } from './api/axios';
 
-const API_URL = (window.API_URL || import.meta.env.VITE_API_URL || 'http://localhost:8000');
+/**
+ * Response type for Hello World API endpoint
+ */
+export interface HelloWorldResponse {
+  message: string;
+  timestamp: string;
+}
+
 
 const App = () => {
   const [data, setData] = useState<HelloWorldResponse | null>(null);
@@ -12,9 +19,9 @@ const App = () => {
     setLoading(true);
     setError('');
     try {
-      const response = await fetch(`${API_URL}/hello`);
-      const result: HelloWorldResponse = await response.json();
-      setData(result);
+      // const response = await fetch(`${API_URL}/hello/0`);
+      const response = await apiClient.get<HelloWorldResponse>('/hello/0');
+      setData(response.data);
     } catch (err) {
       setError('Error fetching from API');
       console.error('Error fetching from API', err);

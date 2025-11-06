@@ -36,12 +36,6 @@ export const credentials = async (name?: string) => {
     return $cores.tools.asyncCredentials(profile);
 };
 
-//* load yml data via './data/<file>.yml'
-export const loadDataYml = (file: string) => {
-    _log(NS, `loadDataYml(${name})..`);
-    return $cores.tools.loadDataYml(file, 'data');
-};
-
 //* customize createServer().
 const _createServer = () => {
     //NOTE - `app` is ready during default initializer.
