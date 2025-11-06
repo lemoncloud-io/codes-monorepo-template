@@ -1,6 +1,6 @@
 # codes-monorepo-template
 
-monorepo with `lemon-core` based serverless API and React frontend
+Monorepo with `lemon-core` based `Serverless` API and `React` frontend
 
 ## Architecture
 
@@ -48,10 +48,12 @@ Web will be available at <http://localhost:3000>
 ### Run Refactor
 
 ```bash
-# pre-peration
+# preparing before refactoring.
 ./refactor-prepare.sh <app-in-sample-folder>
+
 # refactoring backend w/ gemini
 ./refactor-backend.sh
+
 # refactoring frontend w/ gemini
 ./refactor-frontend.sh
 ```

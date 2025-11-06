@@ -5,59 +5,7 @@ config:
     defaultValue: temp
     description: 'Name for project identification'
     isHidden: 1
-  runtime:
-    isRequired: 1
-    type: string
-    options:
-      - nodejs18.x
-      - nodejs22.x
-    defaultValue: nodejs22.x
-    description: 'Runtime environment'
-    immutable: 1
-  region:
-    isRequired: 1
-    type: string
-    defaultValue: ap-northeast-2
-    description: 'AWS region'
-    immutable: 1
-  stage:
-    isRequired: 1
-    type: string
-    options:
-      - dev
-      - prod
-    defaultValue: dev
-    description: 'Deployment stage'
-    immutable: 1
 environ:
-  LS:
-    isRequired: 1
-    type: boolean
-    defaultValue: 0
-    description: 'Hide logs (0: disabled, 1: enabled)'
-    redeploy: 1
-  LC:
-    isRequired: 1
-    type: boolean
-    defaultValue: 1
-    description: 'Enable log coloring (0: disabled, 1: enabled)'
-    redeploy: 1
-  TS:
-    isRequired: 1
-    type: boolean
-    defaultValue: 1
-    description: 'Include timestamp in logs (0: disabled, 1: enabled)'
-    redeploy: 1
-  MY_DYNAMO_TABLE:
-    isRequired: 0
-    type: string
-    description: 'Name of the DynamoDB table to use for integration'
-    immutable: 1
-  SQS_ENDPOINT:
-    isRequired: 0
-    type: string
-    description: 'SQS endpoint or configuration to integrate'
-    immutable: 0
   API_KEY:
     isRequired: 0
     type: string

@@ -11,8 +11,7 @@
  * ```
  */
 import "dotenv/config"; // API 키를 .env 파일에서 로드
-import mustache from "mustache";
-import { $ai, $fs } from "./common";
+import { $ai, $fs } from "./lib/common";
 import { GenerateContentParameters } from "@google/genai";
 
 // 메인 리팩토링 함수
@@ -27,7 +26,7 @@ async function refactorCode(args: string[]) {
   console.log(`Starting code refactoring for step[${runType}/${runStep}] ...`);
 
   const ai = $ai("GEMINI_API_KEY");
-  const fs = $fs(runType);
+  const fs = $fs(runType, __dirname);
 
   //* for test.
   // if (runType == 'backend'){
@@ -48,14 +47,9 @@ async function refactorCode(args: string[]) {
       fs.loadCode("apiCode"),
       fs.loadCode("appCode"),
     ]);
-    const prompt = mustache.render(USER_PROMPT, {
-      serviceCode,
-      typeCode,
-      apiCode,
-      appCode,
-    });
-    // if (runType) return console.log(prompt);
+    const prompt = fs.render(USER_PROMPT, { serviceCode, typeCode, apiCode, appCode });
 
+    console.log("--------------------------------------------------");
     console.log("🤖 Gemini에게 코드 리팩토링을 요청합니다...");
     console.log("==================================================");
 
@@ -79,10 +73,9 @@ async function refactorCode(args: string[]) {
     const resultCode = fs.parseResult(jsonString);
 
     // 6. 결과 출력
-    console.log("---------------------------------------------------");
+    console.log("--------------------------------------------------");
     console.log(`✅ 리팩토[단계: ${runStep}] 완료! 결과는 다음과 같습니다.`);
     console.log("==================================================");
-    console.log(resultCode);
 
     // 파일 저장.
     if (!resultCode) {
@@ -98,8 +91,9 @@ async function refactorCode(args: string[]) {
       if (resultCode.appCode) await fs.saveCode('appCode', resultCode.appCode);
     }
     
-    const usage = result?.usageMetadata;
-    if (usage && typeof resultCode === 'object') (resultCode as any).$usage = usage;
+    const $usage = result?.usageMetadata;
+    if ($usage && typeof resultCode === 'object') (resultCode as any).$usage = $usage;
+    else if (typeof resultCode === 'string') return { result: resultCode, $usage };
     return resultCode;
   } catch (error) {
     if (error instanceof Error && "code" in error && error.code === "ENOENT") {

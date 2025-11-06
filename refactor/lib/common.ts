@@ -7,8 +7,8 @@
 import { GoogleGenAI } from "@google/genai";
 import * as fs from "fs/promises";
 import * as path from "path";
-import "dotenv/config"; // API 키를 .env 파일에서 로드
-import { asYml, fromYml } from "./lib/yml";
+import mustache from "mustache";
+import { asYml, fromYml } from "./yml";
 
 // Factory 함수로 Gemini AI 인스턴스 생성
 export const $ai = (API_KEY: string) => {
@@ -77,11 +77,13 @@ export const $fs = (scope: string, _baseRoot: string = __dirname) => {
   const asFileName = (file: string): FileName => {
     return Object.entries(fileMap).find(([_, v]) => v === file)?.[0] as FileName;
   };
+  /** load code by name */
   const loadCode = async (name: FileName, baseRoot = _baseRoot) => {
     const filePath = fileMap[name];
     if (!filePath) return '';
     return readFile(filePath, path.join(baseRoot, ".."));
   };
+  /** save code by name */
   const saveCode = async (
     name: FileName,
     content: string,
@@ -94,6 +96,7 @@ export const $fs = (scope: string, _baseRoot: string = __dirname) => {
     await fs.writeFile(fullPath, content, "utf-8");
   };
 
+  /** parse result from Gemini response */
   const parseResult = (txt: any) => {
 
     if (typeof txt !== "string") return null;
@@ -142,6 +145,11 @@ export const $fs = (scope: string, _baseRoot: string = __dirname) => {
     }
   };
 
+  /** render template with view */
+  const render = (template: string, view: object) => {
+    return mustache.render(template, view);
+  };
+
   // export.
-  return { readFile, saveFile, loadCode, saveCode, parseResult };
+  return { readFile, saveFile, loadCode, saveCode, parseResult, render };
 };
