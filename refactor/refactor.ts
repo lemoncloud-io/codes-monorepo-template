@@ -13,6 +13,7 @@
 import "dotenv/config"; // API 키를 .env 파일에서 로드
 import mustache from "mustache";
 import { $ai, $fs } from "./common";
+import { GenerateContentParameters } from "@google/genai";
 
 // 메인 리팩토링 함수
 async function refactorCode(args: string[]) {
@@ -41,15 +42,17 @@ async function refactorCode(args: string[]) {
     // --- 프롬프트 설정 ---
     const SYSTEM_PROMPT = await fs.readFile(`${runType}/SYSTEM.md`);
     const USER_PROMPT = await fs.readFile(`${runType}/` + (runStep ? `USER-STEP${runStep}.md` : `USER.md`));
-    const [serviceCode, typeCode, apiCode] = await Promise.all([
+    const [serviceCode, typeCode, apiCode, appCode] = await Promise.all([
       fs.loadCode("serviceCode"),
       fs.loadCode("typeCode"),
       fs.loadCode("apiCode"),
+      fs.loadCode("appCode"),
     ]);
     const prompt = mustache.render(USER_PROMPT, {
       serviceCode,
       typeCode,
       apiCode,
+      appCode,
     });
     // if (runType) return console.log(prompt);
 
@@ -57,7 +60,7 @@ async function refactorCode(args: string[]) {
     console.log("==================================================");
 
     // 5. Gemini API 호출
-    const result = await ai.models.generateContent({
+    const params: GenerateContentParameters = {
       model: 1 ? "gemini-2.5-pro" : "gemini-pro",
       contents: prompt,
       config: {
@@ -66,7 +69,9 @@ async function refactorCode(args: string[]) {
         topP: 0.95,
         // maxOutputTokens: 2048, //WARN - may not work!
       },
-    });
+    };
+    fs.saveFile(`logs/params-${runType}${runStep ? '-' + runStep : ''}.yml`, params);
+    const result = await ai.models.generateContent(params);
 
     // 6. 호출 결과
     fs.saveFile(`logs/result-${runType}${runStep ? '-' + runStep : ''}.yml`, result);
@@ -90,8 +95,12 @@ async function refactorCode(args: string[]) {
       if (resultCode.serviceCode) await fs.saveCode('serviceCode', resultCode.serviceCode);
       if (resultCode.typeCode) await fs.saveCode('typeCode', resultCode.typeCode);
       if (resultCode.apiCode) await fs.saveCode('apiCode', resultCode.apiCode);
+      if (resultCode.appCode) await fs.saveCode('appCode', resultCode.appCode);
     }
-
+    
+    const usage = result?.usageMetadata;
+    if (usage && typeof resultCode === 'object') (resultCode as any).$usage = usage;
+    return resultCode;
   } catch (error) {
     if (error instanceof Error && "code" in error && error.code === "ENOENT") {
       console.error(
@@ -105,7 +114,10 @@ async function refactorCode(args: string[]) {
 }
 
 // runs locally.
-refactorCode(process.argv).catch((e) => {
+refactorCode(process.argv).then(R => {
+  console.log(">> done ...............");
+  console.log(R);
+}).catch((e) => {
   console.error("! error:", e);
   process.exit(1);
 });

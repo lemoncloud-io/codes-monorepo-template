@@ -18,7 +18,7 @@ export const GETERR = (e: any) =>
 export const asYml = <T extends object>(N: T): string => {
   if (!N) return "";
   // return YAML.stringify(N);
-  return YAML.dump(N);
+  return YAML.dump(N, { lineWidth: -1 });
 };
 
 /** convert any json to yml with defined values only */

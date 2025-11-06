@@ -35,6 +35,9 @@ export const $fs = (scope: string, _baseRoot: string = __dirname) => {
     if (typeof content === "string" && content.startsWith("{") && content.endsWith("}")) {
       return JSON.parse(content) as T;
     }
+    if (typeof content === "string") {
+      return content?.split('\r').join('') as unknown as T; // normalize to LF
+    }
     return content as unknown as T;
   };
 
@@ -46,6 +49,7 @@ export const $fs = (scope: string, _baseRoot: string = __dirname) => {
   ) => {
     filePath = baseRoot ? path.join(baseRoot, filePath) : filePath;
     filePath = path.resolve(filePath);
+
     if (typeof content === "object" && filePath?.endsWith(".yml")) content = asYml(content);
     else if (typeof content === "object") content = JSON.stringify(content, null, 2);
 
@@ -62,11 +66,11 @@ export const $fs = (scope: string, _baseRoot: string = __dirname) => {
     serviceCode: "apps/backend/src/services/geminiService.ts",
     typeCode: "apps/backend/src/services/types.ts",
     apiCode: "apps/backend/src/api/hello-api.ts",
+    appCode: "apps/frontend/src/App.tsx",
   };
   if (scope == 'frontend'){
     fileMap.serviceCode = "apps/frontend/src/services/geminiService.ts";
     fileMap.typeCode = "apps/frontend/src/types.ts";
-    fileMap.apiCode = "";
   }
 
   type FileName = keyof typeof fileMap;
