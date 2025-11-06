@@ -1,8 +1,8 @@
 #!/bin/sh
-# backend-refactor-prep.sh
+# refactor-prepare.sh
 # - 이 스크립트는 백엔드 코드 리팩토링을 준비하기 위한 사전 단계를 수행합니다.
-# - 사용법: ./backend-refactor-prep.sh <name-in-sample-app>
-# - 예시: ./backend-refactor-prep.sh ai-blog-title-generator
+# - 사용법: ./refactor-prepare.sh <name-in-sample-app>
+# - 예시: ./refactor-prepare.sh ai-blog-title-generator
 
 set -e  # 오류 발생 시 즉시 종료
 

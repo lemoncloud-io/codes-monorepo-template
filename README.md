@@ -49,9 +49,11 @@ Web will be available at <http://localhost:3000>
 
 ```bash
 # pre-peration
-./refactor-prep.sh <app-in-sample-folder>
+./refactor-prepare.sh <app-in-sample-folder>
 # refactoring backend w/ gemini
 ./refactor-backend.sh
+# refactoring frontend w/ gemini
+./refactor-frontend.sh
 ```
 
 ## License
