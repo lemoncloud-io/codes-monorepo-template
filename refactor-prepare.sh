@@ -19,7 +19,7 @@ PKG_JSON="$BACKEND_DIR/package.json"
 APP_DIR="sample/$APP_NAME"
 APP_SERVICES="$APP_DIR/services"
 APP_TYPES="$APP_DIR/types.ts"
-BACKEND_SOURCES="$BACKEND_DIR/src"
+BACKEND_SOURCE="$BACKEND_DIR/src"
 BACKEND_SERVICES="$BACKEND_DIR/src/services"
 
 FRONTEN_DIR="apps/frontend"
@@ -43,7 +43,7 @@ if [ -f "$APP_SERVICES/geminiService.ts" ]; then
   cp -rf "$APP_SERVICES/" "./$BACKEND_SERVICES/"
   cp -rf "$APP_SERVICES/" "./$FRONTEN_SERVICES/"
   echo "Copy gemini service file successful!"
-  ls "$BACKEND_SERVICE/geminiService.ts" 2>/dev/null || echo "Copy to backend failed."
+  ls "$BACKEND_SERVICES/geminiService.ts" 2>/dev/null || echo "Copy to backend failed."
   ls "$FRONTEN_SERVICES/geminiService.ts" 2>/dev/null || echo "Copy to frontend failed."
 else
   echo "Gemini Service file not exist → $APP_SERVICES"
@@ -56,7 +56,7 @@ echo "[3/4] Copying types.ts file..."
 if [ -f "$APP_TYPES" ]; then
   cp "$APP_TYPES" "./$BACKEND_SERVICES/types.ts"
   echo "Copy types file successful! (backend, frontend)"
-  ls "$BACKEND_SERVICE/types.ts" 2>/dev/null || echo "Copy to backend failed."
+  ls "$BACKEND_SERVICES/types.ts" 2>/dev/null || echo "Copy to backend failed."
 else
   echo "Types file not exist → $APP_SERVICES"
 fi
@@ -65,11 +65,11 @@ fi
 # ----------------------------------------------------------
 echo "[4/4] Copying file..."
 if [ -d "$APP_DIR/utils" ]; then
-  cp -rf "$APP_DIR/utils/" "./$BACKEND_SOURCES/utils/"
-  cp -rf "$APP_DIR/utils/" "./$FRONTEN_SOURCES/utils/"
+  cp -rf "$APP_DIR/utils/" "./$BACKEND_SOURCE/utils/"
+  cp -rf "$APP_DIR/utils/" "./$FRONTEN_SOURCE/utils/"
   echo "Copy utils folder successful! (backend, frontend)"
-  ls "$BACKEND_SOURCES/utils" 2>/dev/null || echo "WARN! Copy to backend/utils failed."
-  ls "$FRONTEN_SOURCES/utils" 2>/dev/null || echo "WARN! Copy to frontend/utils failed."
+  ls "$BACKEND_SOURCE/utils" 2>/dev/null || echo "WARN! Copy to backend/utils failed."
+  ls "$FRONTEN_SOURCE/utils" 2>/dev/null || echo "WARN! Copy to frontend/utils failed."
 fi
 if [ -d "$APP_DIR/components" ]; then
   cp -rf "$APP_DIR/components/" "./$FRONTEN_SOURCE/components/"
@@ -100,12 +100,10 @@ if [ -f "$APP_DIR/index.html" ]; then
   cp -rf "$APP_DIR/index.html" "./$FRONTEN_SOURCE/../index.html"
   echo "Copy index.html successful!"
   ls "$FRONTEN_SOURCE/../index.html" 2>/dev/null || echo "WARN! Copy to frontend/index.html failed."
-  # GNU/BSD 간단 분기
-  if sed --version >/dev/null 2>&1; then
-    sed -i 's#/index\\.tsx#/src/index.tsx#g' "$FRONTEN_SOURCE/../index.html"
-  else
-    sed -i '' 's#/index\\.tsx#/src/index.tsx#g' "$FRONTEN_SOURCE/../index.html"
-  fi
+  # sed -i 호환성(GNU/BSD/BusyBox) 이슈 회피: 임시 파일로 대체 수행
+  HTML_FILE="$FRONTEN_SOURCE/../index.html"
+  TMP_FILE="${HTML_FILE}.tmp"
+  sed 's#/index\\.tsx#/src/index.tsx#g' "$HTML_FILE" > "$TMP_FILE" && mv "$TMP_FILE" "$HTML_FILE"
 fi
 if [ -f "$APP_DIR/types.ts" ]; then
   cp -rf "$APP_DIR/types.ts" "./$FRONTEN_SOURCE/"
