@@ -103,7 +103,23 @@ if [ -f "$APP_DIR/index.html" ]; then
   # sed -i 호환성(GNU/BSD/BusyBox) 이슈 회피: 임시 파일로 대체 수행
   HTML_FILE="$FRONTEN_SOURCE/../index.html"
   TMP_FILE="${HTML_FILE}.tmp"
-  sed 's#/index\\.tsx#/src/index.tsx#g' "$HTML_FILE" > "$TMP_FILE" && mv "$TMP_FILE" "$HTML_FILE"
+  echo "[replace] target: $HTML_FILE"
+  echo "[replace] before matches (index.tsx):"
+  { grep -n 'index.tsx' "$HTML_FILE" || true; } | sed 's/^/  /'
+  COUNT_BEFORE=$(grep -c 'index.tsx' "$HTML_FILE" 2>/dev/null || true)
+  [ -z "$COUNT_BEFORE" ] && COUNT_BEFORE=0
+  echo "[replace] before count: $COUNT_BEFORE"
+  # 다양한 표기("/index.tsx", "index.tsx", "./index.tsx") 모두를 /src/index.tsx 로 통일
+  sed \
+    -e 's|/index.tsx|/src/index.tsx|g' \
+    -e 's|"index.tsx"|"/src/index.tsx"|g' \
+    -e 's|"\./index.tsx"|"/src/index.tsx"|g' \
+    "$HTML_FILE" > "$TMP_FILE" && mv "$TMP_FILE" "$HTML_FILE"
+  echo "[replace] after matches (/src/index.tsx):"
+  { grep -n '/src/index.tsx' "$HTML_FILE" || true; } | sed 's/^/  /'
+  COUNT_AFTER=$(grep -c '/src/index.tsx' "$HTML_FILE" 2>/dev/null || true)
+  [ -z "$COUNT_AFTER" ] && COUNT_AFTER=0
+  echo "[replace] after count: $COUNT_AFTER"
 fi
 if [ -f "$APP_DIR/types.ts" ]; then
   cp -rf "$APP_DIR/types.ts" "./$FRONTEN_SOURCE/"
