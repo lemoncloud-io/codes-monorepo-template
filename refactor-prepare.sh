@@ -82,9 +82,9 @@ if [ -d "$APP_DIR/services" ]; then
   ls "$FRONTEN_SOURCE/services" 2>/dev/null || echo "WARN! Copy to frontend/services failed."
 fi
 if [ -f "$APP_DIR/constants.ts" ]; then
-  cp -rf "$APP_DIR/constants.ts" "./$FRONTEN_SOURCES/"
+  cp -rf "$APP_DIR/constants.ts" "./$FRONTEN_SOURCE/"
   echo "Copy constants.ts successful!"
-  ls "$FRONTEN_SOURCES/constants.ts" 2>/dev/null || echo "WARN! Copy to frontend/constants.ts failed."
+  ls "$FRONTEN_SOURCE/constants.ts" 2>/dev/null || echo "WARN! Copy to frontend/index.tsx failed."
 fi
 if [ -f "$APP_DIR/App.tsx" ]; then
   cp -rf "$APP_DIR/App.tsx" "./$FRONTEN_SOURCE/"
