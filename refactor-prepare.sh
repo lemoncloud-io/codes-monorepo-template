@@ -66,8 +66,10 @@ fi
 echo "[4/4] Copying file..."
 if [ -d "$APP_DIR/utils" ]; then
   cp -rf "$APP_DIR/utils/" "./$BACKEND_SOURCES/utils/"
-  echo "Copy utils folder successful!"
+  cp -rf "$APP_DIR/utils/" "./$FRONTEN_SOURCES/utils/"
+  echo "Copy utils folder successful! (backend, frontend)"
   ls "$BACKEND_SOURCES/utils" 2>/dev/null || echo "WARN! Copy to backend/utils failed."
+  ls "$FRONTEN_SOURCES/utils" 2>/dev/null || echo "WARN! Copy to frontend/utils failed."
 fi
 if [ -d "$APP_DIR/components" ]; then
   cp -rf "$APP_DIR/components/" "./$FRONTEN_SOURCE/components/"
