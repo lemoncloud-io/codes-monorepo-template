@@ -19,6 +19,7 @@ PKG_JSON="$BACKEND_DIR/package.json"
 APP_DIR="sample/$APP_NAME"
 APP_SERVICES="$APP_DIR/services"
 APP_TYPES="$APP_DIR/types.ts"
+BACKEND_SOURCES="$BACKEND_DIR/src"
 BACKEND_SERVICES="$BACKEND_DIR/src/services"
 
 FRONTEN_DIR="apps/frontend"
@@ -60,11 +61,14 @@ else
   echo "Types file not exist → $APP_SERVICES"
 fi
 
-
 # 3. types.ts 파일 복사
 # ----------------------------------------------------------
-echo "[4/4] Copying frontend file..."
-
+echo "[4/4] Copying file..."
+if [ -d "$APP_DIR/utils" ]; then
+  cp -rf "$APP_DIR/utils/" "./$BACKEND_SOURCES/utils/"
+  echo "Copy utils folder successful!"
+  ls "$BACKEND_SOURCES/utils" 2>/dev/null || echo "WARN! Copy to backend/utils failed."
+fi
 if [ -d "$APP_DIR/components" ]; then
   cp -rf "$APP_DIR/components/" "./$FRONTEN_SOURCE/components/"
   echo "Copy components folder successful!"
@@ -74,11 +78,6 @@ if [ -d "$APP_DIR/services" ]; then
   cp -rf "$APP_DIR/services/" "./$FRONTEN_SOURCE/services/"
   echo "Copy services folder successful!"
   ls "$FRONTEN_SOURCE/services" 2>/dev/null || echo "WARN! Copy to frontend/services failed."
-fi
-if [ -d "$APP_DIR/utils" ]; then
-  cp -rf "$APP_DIR/utils/" "./$FRONTEN_SOURCE/utils/"
-  echo "Copy utils folder successful!"
-  ls "$FRONTEN_SOURCE/utils" 2>/dev/null || echo "WARN! Copy to frontend/utils failed."
 fi
 if [ -f "$APP_DIR/App.tsx" ]; then
   cp -rf "$APP_DIR/App.tsx" "./$FRONTEN_SOURCE/"
