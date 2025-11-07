@@ -89,7 +89,12 @@ if [ -f "$APP_DIR/index.html" ]; then
   cp -rf "$APP_DIR/index.html" "./$FRONTEN_SOURCE/../index.html"
   echo "Copy index.html successful!"
   ls "$FRONTEN_SOURCE/../index.html" 2>/dev/null || echo "WARN! Copy to frontend/index.html failed."
-  sed -i '' 's#/index\.tsx#/src/index.tsx#g' "$FRONTEN_SOURCE/../index.html"
+  # GNU/BSD 간단 분기
+  if sed --version >/dev/null 2>&1; then
+    sed -i 's#/index\\.tsx#/src/index.tsx#g' "$FRONTEN_SOURCE/../index.html"
+  else
+    sed -i '' 's#/index\\.tsx#/src/index.tsx#g' "$FRONTEN_SOURCE/../index.html"
+  fi
 fi
 if [ -f "$APP_DIR/types.ts" ]; then
   cp -rf "$APP_DIR/types.ts" "./$FRONTEN_SOURCE/"
