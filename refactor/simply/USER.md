@@ -23,7 +23,7 @@ AI Studio에서 만들어진 `geminiService.ts` 파일의 주요 로직이 백�
   └──────────────────┘    └──────────────────┘
 ```
 
-## 파일 구조
+### 파일 구조
 
 `apps` 폴더안에 백엔드(backend)부분과 프론트(fronend) 코드가 하나의 저장소에서 분리되어 있음.
 
@@ -79,8 +79,8 @@ apps
 - **(Service 시그니처 리팩토링)** 함수에 인풋 파라미터를 단일 객체(예시 `$body: { name: string }`)로 패키징시켜서 API 호출용 `$body`를 준비합니다. 그리고 리턴타입에 맞춘 API 호출로 변경합니다(단, 함수의 파라미터와 리턴 타입은 **절대** 변경하지 않습니다)
 - `GoogleGenAI` 실행은 백엔드에서 하므로, 여기에서는 `import { GoogleGenAI } from "@google/genai"` 를 포함한 관련된 코드를 정리해줍니다.
 - **(API 연동작업)** 매칭되는 API HTTP Endpoint는  **`/hello/:id/generate`** 형식으로 지정합니다. `:id` 값은 `geminiService.ts`의 메인 함수명을 camelCase -> `dash-case` 로 변환하여 사용합니다. body에서 필요한 값을 추출해 `$body` 객체를 생성하고, 이를 API 요청에 대한 body로 사용합니다. (예시: `apiClient.post<ReturnType>('/hello/say-hello/generate', $body)`)
-- **(중요)** 절대! 원본 함수의 입력과 출력은 그대로 유지하여야 하며, `apiClient`를 이용한 호출로 변경합니다. `apiClient`의 호출시 응답 결과는 `data` 속성에 있음.
 - `types.ts` 파일이 존재하지 않거나 비어있는 경우 → **상단에 `./types` 타입 import 코드를 추가하지 않으며**, `$body` 구조 리팩토링만 수행합니다.
+- **(중요)** 절대! 원본 함수의 입력과 출력은 그대로 유지하여야 하며, `apiClient`를 이용한 호출로 변경합니다. `apiClient`의 호출시 응답 결과는 `data` 속성에 있음.
 
 **[예제코드]**
 
@@ -91,6 +91,37 @@ apps
     const response = await apiClient.post<ReturnType>(path, $body);
     return response?.data as ReturnType;
   }
+  ```
+
+- **(파일이용)** 서비스 함수내에서 파일을 참조할 경우, 이를 읽어서 base64로 인코딩된 `MediaData`로 변환하여 이용합니다. (예: `type interface MediaData { base64: string mimeType: string; }`) 파일를 `MediaData`로 변환하는 샘픔 코드는 아래의 `예제코드`를 참고합니다.
+
+  **[예제코드]**
+
+  ```ts
+  export interface MediaData {
+    /** base64 encoded data */    
+    base64: string;
+    /** mime-type of media */
+    mimeType: string;
+  }
+  export const fileToMediaData = (file: File): Promise<MediaData> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const result = reader.result as string;
+        // The result is 'data:image/jpeg;base64,LzlqLz...', we only need the part after the comma.
+        const base64 = result.split(',')[1];
+        const mimeType = file.type;
+        if (!base64 || !mimeType) {
+          reject(new Error("Failed to read file details"));
+          return;
+        }
+        resolve({ base64, mimeType });
+      };
+      reader.onerror = (error) => reject(error);
+    });
+  };
   ```
 
 3. `apps/frontend/src/App.tsx` 파일 작업
