@@ -1,6 +1,6 @@
 {
     "name": "codes-monorepo-template",
-    "version": "0.25.1114",
+    "version": "0.25.1114a",
     "description": "Simplified monorepo for code samples using LemonCore",
     "scripts": {
         "backend": "cd apps/backend && npm run dev",

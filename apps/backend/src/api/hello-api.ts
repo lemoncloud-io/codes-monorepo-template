@@ -26,6 +26,7 @@ const NS = $U.NS('hello', 'yellow'); // NAMESPACE TO BE PRINTED.
  * - PUT    /hello/:id     => update-existing (at position :id)
  * - DELETE /hello/:id     => delete-existing (at position :id)
  * - GET    /hello/:id/say => get-one with say command.
+ * - POST   /hello/:id/say => set-one with say command.
  */
 export class HelloAPIController extends GeneralWEBController {
     /**
@@ -55,7 +56,9 @@ export class HelloAPIController extends GeneralWEBController {
     public doList: NextHandler = async (id, param, body, context) => {
         const errScope = `doList(${this.type()}/${id ?? ''})`;
         _log(NS, `${errScope} ...`);
-        throw new Error(`NOT IMPLEMENTED - ${errScope}`);
+        id = id === '0' ? '' : $T.S2(id);
+        if (id) throw new Error(`@id[${id}] is invalid - ${errScope}`);
+        throw new Error(`401 NOT IMPLEMENTED - ${errScope}`);
     };
 
     /**
