@@ -50,7 +50,8 @@ export const $fs = (scope: string, _baseRoot: string = __dirname) => {
     filePath = baseRoot ? path.join(baseRoot, filePath) : filePath;
     filePath = path.resolve(filePath);
 
-    if (typeof content === "object" && filePath?.endsWith(".yml")) content = asYml(content);
+    if (content == null || content === undefined) content = "";
+    else if (typeof content === "object" && filePath?.endsWith(".yml")) content = asYml(content);
     else if (typeof content === "object") content = JSON.stringify(content, null, 2);
 
     if (!(await fs.lstat(path.dirname(filePath))).isDirectory())

@@ -12,7 +12,7 @@
  */
 import "dotenv/config"; // API 키를 .env 파일에서 로드
 import { $ai, $fs } from "./lib/common";
-import { GenerateContentParameters } from "@google/genai";
+import { GenerateContentParameters, GenerateContentResponse } from "@google/genai";
 
 // 메인 리팩토링 함수
 async function refactorCode(args: string[]) {
@@ -28,17 +28,10 @@ async function refactorCode(args: string[]) {
   const ai = $ai("GEMINI_API_KEY");
   const fs = $fs(runType, __dirname);
 
-  //* for test.
-  // if (runType == 'backend'){
-  //   const result = await fs.readFile('sample/result-backend.yml');
-  //   console.log("==================================================");
-  //   const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
-  //   console.log($fs.parseResult(text));
-  //   return;
-  // }
-
   try {
     // --- 프롬프트 설정 ---
+
+    // 3. 프롬프트 빌드
     const SYSTEM_PROMPT = await fs.readFile(`${runType}/SYSTEM.md`);
     const USER_PROMPT = await fs.readFile(`${runType}/` + (runStep ? `USER-STEP${runStep}.md` : `USER.md`));
     const [serviceCode, typeCode, apiCode, appCode] = await Promise.all([
@@ -53,7 +46,7 @@ async function refactorCode(args: string[]) {
     console.log("🤖 Gemini에게 코드 리팩토링을 요청합니다...");
     console.log("==================================================");
 
-    // 5. Gemini API 호출
+    // 4. 호출 준비
     const params: GenerateContentParameters = {
       model: 1 ? "gemini-2.5-pro" : "gemini-pro",
       contents: prompt,
@@ -65,12 +58,17 @@ async function refactorCode(args: string[]) {
       },
     };
     fs.saveFile(`logs/params-${runType}${runStep ? '-' + runStep : ''}.yml`, params);
-    const result = await ai.models.generateContent(params);
 
-    // 6. 호출 결과
+    // 5. 호출 실행
+    const _genAI = async (params: GenerateContentParameters): Promise<GenerateContentResponse> => {
+      // if (runType === 'simply') return null as any; // IGNORE
+      return await ai.models.generateContent(params);
+    }
+    const result = await _genAI(params);
+
     fs.saveFile(`logs/result-${runType}${runStep ? '-' + runStep : ''}.yml`, result);
-    const jsonString = result?.text?.trim();
-    const resultCode = fs.parseResult(jsonString);
+    const jsonString = result?.text?.trim() ?? '';
+    const resultCode = jsonString == '' ? '' : fs.parseResult(jsonString);
 
     // 6. 결과 출력
     console.log("--------------------------------------------------");
@@ -78,7 +76,9 @@ async function refactorCode(args: string[]) {
     console.log("==================================================");
 
     // 파일 저장.
-    if (!resultCode) {
+    if (resultCode === '') {
+      console.log("WARN! 리팩토링된 코드가 비어있습니다.");
+    } else if (!resultCode) {
       throw new Error("리팩토링된 코드가 없습니다.");
     } else if (typeof resultCode === 'string' && runStep) {
       if (runStep === 1) await fs.saveCode('serviceCode', resultCode);
