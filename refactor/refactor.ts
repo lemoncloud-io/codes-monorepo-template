@@ -34,13 +34,16 @@ async function refactorCode(args: string[]) {
     // 3. 프롬프트 빌드
     const SYSTEM_PROMPT = await fs.readFile(`${runType}/SYSTEM.md`);
     const USER_PROMPT = await fs.readFile(`${runType}/` + (runStep ? `USER-STEP${runStep}.md` : `USER.md`));
-    const [serviceCode, typeCode, apiCode, appCode] = await Promise.all([
-      fs.loadCode("serviceCode"),
-      fs.loadCode("typeCode"),
-      fs.loadCode("apiCode"),
-      fs.loadCode("appCode"),
-    ]);
-    const prompt = fs.render(USER_PROMPT, { serviceCode, typeCode, apiCode, appCode });
+    const _loadCodes = async () => {
+      const codes = fs.listCodeNames();
+      // console.log(`> 로드할 코드 목록:`, codes?.join(', '));
+      const results: Record<string, string> = {};
+      for (const codeName of codes) {
+        results[codeName] = await fs.loadCode(codeName).then(R => R ?? '').catch(e => `// Error: ${e?.message}`);
+      }
+      return results;
+    }
+    const prompt = fs.render(USER_PROMPT, await _loadCodes());
 
     console.log("--------------------------------------------------");
     console.log("🤖 Gemini에게 코드 리팩토링을 요청합니다...");
@@ -52,7 +55,7 @@ async function refactorCode(args: string[]) {
       contents: prompt,
       config: {
         systemInstruction: SYSTEM_PROMPT,
-        temperature: 0.8,
+        temperature: 0 ? 0.4 : 0.8,
         topP: 0.95,
         // maxOutputTokens: 2048, //WARN - may not work!
       },
@@ -61,7 +64,8 @@ async function refactorCode(args: string[]) {
 
     // 5. 호출 실행
     const _genAI = async (params: GenerateContentParameters): Promise<GenerateContentResponse> => {
-      if (runType === 'simply') return await fs.readFile<any>('logs/result-simply-01.yml').then(R => {
+      // if (1) return null as any;
+      if (0 && runType === 'simply') return await fs.readFile<any>('logs/result-simply-01.yml').then(R => {
         const text = R?.candidates?.[0]?.content?.parts?.[0].text ?? '';
         return { text } as any;
       });

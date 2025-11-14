@@ -38,17 +38,21 @@ apps
  │   │-- express.ts
  │   │-- index.ts
  │   └-- service
- │     |-- model.ts
- │     |-- service.ts
- │     |-- types.ts
- │     └-- views.ts
+ │   │ │-- model.ts
+ │   │ │-- service.ts
+ │   │ │-- types.ts
+ │   │ └-- views.ts
+ │   └-- services
+ │     └-- geminiService.ts
  └-- frontend
-   |-- index.html
-   |-- package.json
+   │-- index.html
+   │-- package.json
    └-- src
-     |-- App.tsx
-     |-- api
-     | └-- axios.tsx
+     │-- App.tsx
+     │-- api
+     │ └-- axios.tsx
+     └-- services
+     │ └-- geminiService.ts
      └-- index.tsx
  ```
 
@@ -59,8 +63,6 @@ apps
 **[사전작업]** AI Studio 의 결과물은 zip으로 되어 있으며, 별도 외부 프로그램을 이용해서 zip 파일내 코드가 `파일 구조`내 폴더로 각기 복사되어 집니다.
 
 **[작업목표]** 리팩토링 작업이 필요한 부분에 대해서는 아래의 `## 기존 코드` 섹션에 설명되며, 각 파일별 주요 변경 전략은 다음과 같습니다.
-
--------
 
 ### 작업 1단계: 프론트엔드
 
@@ -96,9 +98,23 @@ apps
 - 보통은 `geminiService.ts`내의 함수 사용을 참고용을 -> **아무것도 출력하지 않습니다.** (빈 응답)
 - 단, `geminiService.ts` 함수의 파라미터 변경시 호출 부분에서 함께 변경 필요함!
 
--------
-
 ### 작업 2단계: 백엔드
+
+> 백엔드에서의 리팩토링 주요 작업은 `hello-api.ts` 와 `geminiService.ts` 코드내 함수의 연결입니다.
+> **절대** 반드시 `@google/genai` 패키지의 `GoogleGenAI`를 이용하는 기존 코드는 그대로 유지합니다 → **GoogleGenAI() 사용 코드 유지**
+> **주의** `geminiService.ts` 코드내 함수들의 파라미터 변경만 적용합니다.
+
+  **[GoogleGenAI 사용예제]**
+
+  ```ts
+  import { GoogleGenAI } from "@google/genai";
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: '#prompt to say hello',
+  });
+  console.log(response.text.trim());
+  ```
 
 1. `apps/backend/src/services/types.ts` 파일 작업
 
@@ -107,18 +123,18 @@ apps
 2. `apps/backend/src/services/geminiService.ts` 파일 작업
 
 - **(Service 시그니처 리팩토링)** 유저 프롬프트에 `apps/backend/src/services/types.ts` 코드가 포함된 경우에만 상단에 **`./types`타입 import** 코드를 추가합니다.
-- App의 메인 함수에 인풋 파라미터가 존재할 경우, 이를 단일 객체(`$param: { name: string }` 예시)로 변경하고, 내부 참조를 `$param?.name`(예시) 형태로 수정합니다.
-- `API_KEY`를 환경변수에서 이용할 경우, `GEMINI_API_KEY`의 환경변수로도 이용할 수 있도록 변경 (ex: `process.env.API_KEY = process.env.API_KEY || process.env.GEMINI_API_KEY;`)
+- **(환경변수)** `API_KEY`를 환경변수에서 이용할 경우, `GEMINI_API_KEY`의 환경변수로도 이용할 수 있도록 변경 (ex: `process.env.API_KEY = process.env.API_KEY || process.env.GEMINI_API_KEY;`)
+- **(파라미터 재작성)** App의 메인 함수에 인풋 파라미터가 존재할 경우, 이를 단일 객체(`$param: { name: string }` 예시)로 변경하고, 내부 참조를 `$param?.name`(예시) 형태로 수정합니다.
 - **(메인 함수 파라미터 검증)** 메인 함수가 **인풋을 받지 않을 경우**, 단일 객체(`$param`)로 변경할 필요가 없습니다.
-- **(변경 필요성 검증)**  타입 import 불필요 + `$param` 구조 리팩토링이 불필요한 경우 → **아무것도 변경하지 않고 기존 코드를 그대로 출력합니다.**
+- **(변경 필요성 검증)** 타입 import 불필요 + `$param` 구조 리팩토링이 불필요한 경우 → **아무것도 변경하지 않고 기존 코드를 그대로 출력합니다.**
 - `types.ts` 파일이 존재하지 않거나 비어있는 경우 → **상단에 `./types`타입 import 코드를 추가하지 않으며**, `$param` 구조 리팩토링만 수행합니다.
 
 3. `apps/backend/src/api/hello-api.ts` 파일 작업
 
-- **(API 작성)** **`../services/geminiService`의 메인 함수를 import**합니다.
-- API 함수명은 항상 **`doPostGenerate`**로 하며, HTTP URL은 **`hello/:id/generate`** 형식으로 지정합니다.
+- **(import하기)** **`../services/geminiService`의 메인 함수를 import** 합니다.
+- **(API 연결)** API 함수명은 항상 **`doPostGenerate`**로 하며, HTTP URL은 **`hello/:id/generate`** 형식으로 지정합니다.
 - `:id` 값은 `geminiService.ts`의 메인 함수명을 camelCase -> dash-case로 변환하여 사용합니다.
-- `doPostGenerate` 내에서 if 문으로 `:id`별 분기 로직을 작성합니다. body에서 필요한 값을 추출해 `$param` 객체를 생성하고, 이를 메인 함수에 전달하여 실행 결과를 반환합니다.
+- **(:id 연결)** `doPostGenerate` 내에서 if 문으로 `:id`별 분기 로직을 작성합니다. body에서 필요한 값을 추출해 `$param` 객체를 생성하고, 이를 메인 함수에 전달하여 실행 결과를 반환합니다.
 
 **[API 작성 목적]**  
 
@@ -138,7 +154,7 @@ apps
 - 원본 Type 정의 파일
 
 ```typescript
-{{{typeCode}}}
+{{{appType}}}
 ```
 
 @apps/frontend/src/services/geminiService.ts
@@ -146,7 +162,7 @@ apps
 - AI Studio에서 만들어진 원본 `geminiService.ts` 파일 (복사됨)
 
 ```typescript
-{{{serviceCode}}}
+{{{appService}}}
 ```
 
 @apps/frontend/src/App.tsx
@@ -162,7 +178,7 @@ apps
 - 원본 Type 정의 파일
 
 ```typescript
-{{{typeCode}}}
+{{{apiType}}}
 ```
 
 @apps/backend/src/services/geminiService.ts
@@ -170,7 +186,7 @@ apps
 - AI Studio에서 만들어진 원본 `geminiService.ts` 파일 (복사됨)
 
 ```typescript
-{{{serviceCode}}}
+//! @apps/frontend/src/services/geminiService.ts 파일과 같음 
 ```
 
 @apps/backend/src/api/hello-api.ts
