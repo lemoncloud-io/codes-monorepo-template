@@ -72,13 +72,13 @@
 @apps/frontend/src/types.ts
 
 ```typescript
-{{{typeCode}}}
+{{{appType}}}
 ```
 
 @apps/frontend/src/services/geminiService.ts
 
 ```typescript
-{{{serviceCode}}}
+{{{appService}}}
 ```
 
 @apps/frontend/src/App.tsx

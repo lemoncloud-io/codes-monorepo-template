@@ -50,7 +50,8 @@ export const $fs = (scope: string, _baseRoot: string = __dirname) => {
     filePath = baseRoot ? path.join(baseRoot, filePath) : filePath;
     filePath = path.resolve(filePath);
 
-    if (typeof content === "object" && filePath?.endsWith(".yml")) content = asYml(content);
+    if (content == null || content === undefined) content = "";
+    else if (typeof content === "object" && filePath?.endsWith(".yml")) content = asYml(content);
     else if (typeof content === "object") content = JSON.stringify(content, null, 2);
 
     if (!(await fs.lstat(path.dirname(filePath))).isDirectory())
@@ -62,34 +63,37 @@ export const $fs = (scope: string, _baseRoot: string = __dirname) => {
   /**
    * 파일 맵 정의
    */
-  const fileMap: Record<string, string> = {
-    serviceCode: "apps/backend/src/services/geminiService.ts",
-    typeCode: "apps/backend/src/services/types.ts",
-    apiCode: "apps/backend/src/api/hello-api.ts",
+  const codeMap: Record<string, string> = {
+    //* for app frontend
+    appType: "apps/frontend/src/types.ts",
+    appService: "apps/frontend/src/services/geminiService.ts",
     appCode: "apps/frontend/src/App.tsx",
-  };
-  if (scope == 'frontend'){
-    fileMap.serviceCode = "apps/frontend/src/services/geminiService.ts";
-    fileMap.typeCode = "apps/frontend/src/types.ts";
+    //* for api backend
+    apiService: "apps/backend/src/services/geminiService.ts",
+    apiType: "apps/backend/src/services/types.ts",
+    apiCode: "apps/backend/src/api/hello-api.ts",
   }
 
-  type FileName = keyof typeof fileMap;
-  const asFileName = (file: string): FileName => {
-    return Object.entries(fileMap).find(([_, v]) => v === file)?.[0] as FileName;
+  type CodeName = keyof typeof codeMap;
+  const asFileName = (file: string): CodeName => {
+    return Object.entries(codeMap).find(([_, v]) => v === file)?.[0] as CodeName;
+  };
+  const listCodeNames = (): CodeName[] => {
+    return Object.keys(codeMap) as CodeName[];
   };
   /** load code by name */
-  const loadCode = async (name: FileName, baseRoot = _baseRoot) => {
-    const filePath = fileMap[name];
-    if (!filePath) return '';
+  const loadCode = async <T = any>(name: CodeName, baseRoot = _baseRoot): Promise<T> => {
+    const filePath = codeMap[name];
+    if (!filePath) return null as T;
     return readFile(filePath, path.join(baseRoot, ".."));
   };
   /** save code by name */
   const saveCode = async (
-    name: FileName,
+    name: CodeName,
     content: string,
     baseRoot = _baseRoot
   ) => {
-    const filePath = fileMap[name];
+    const filePath = codeMap[name];
     if (!filePath) throw new Error(`Unknown file name: ${name}`);
     const fullPath = path.resolve(path.join(baseRoot, "..", filePath));
     console.log(`>> Saving code[${name}] to`, fullPath);
@@ -108,7 +112,7 @@ export const $fs = (scope: string, _baseRoot: string = __dirname) => {
         const content = parseResult(s.substring(i).trim());
         return { file, content };
       });
-      const result: Record<FileName, string> = {};
+      const result: Record<CodeName, string> = {};
       for (const item of arr){
         if (item?.file) {
           const itemFileName = asFileName(item.file);
@@ -151,5 +155,5 @@ export const $fs = (scope: string, _baseRoot: string = __dirname) => {
   };
 
   // export.
-  return { readFile, saveFile, loadCode, saveCode, parseResult, render };
+  return { readFile, saveFile, listCodeNames, loadCode, saveCode, parseResult, render };
 };

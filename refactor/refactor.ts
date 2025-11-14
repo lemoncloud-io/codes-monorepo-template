@@ -12,7 +12,7 @@
  */
 import "dotenv/config"; // API 키를 .env 파일에서 로드
 import { $ai, $fs } from "./lib/common";
-import { GenerateContentParameters } from "@google/genai";
+import { GenerateContentParameters, GenerateContentResponse } from "@google/genai";
 
 // 메인 리팩토링 함수
 async function refactorCode(args: string[]) {
@@ -28,49 +28,54 @@ async function refactorCode(args: string[]) {
   const ai = $ai("GEMINI_API_KEY");
   const fs = $fs(runType, __dirname);
 
-  //* for test.
-  // if (runType == 'backend'){
-  //   const result = await fs.readFile('sample/result-backend.yml');
-  //   console.log("==================================================");
-  //   const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
-  //   console.log($fs.parseResult(text));
-  //   return;
-  // }
-
   try {
     // --- 프롬프트 설정 ---
+
+    // 3. 프롬프트 빌드
     const SYSTEM_PROMPT = await fs.readFile(`${runType}/SYSTEM.md`);
     const USER_PROMPT = await fs.readFile(`${runType}/` + (runStep ? `USER-STEP${runStep}.md` : `USER.md`));
-    const [serviceCode, typeCode, apiCode, appCode] = await Promise.all([
-      fs.loadCode("serviceCode"),
-      fs.loadCode("typeCode"),
-      fs.loadCode("apiCode"),
-      fs.loadCode("appCode"),
-    ]);
-    const prompt = fs.render(USER_PROMPT, { serviceCode, typeCode, apiCode, appCode });
+    const _loadCodes = async () => {
+      const codes = fs.listCodeNames();
+      // console.log(`> 로드할 코드 목록:`, codes?.join(', '));
+      const results: Record<string, string> = {};
+      for (const codeName of codes) {
+        results[codeName] = await fs.loadCode(codeName).then(R => R ?? '').catch(e => `// Error: ${e?.message}`);
+      }
+      return results;
+    }
+    const prompt = fs.render(USER_PROMPT, await _loadCodes());
 
     console.log("--------------------------------------------------");
     console.log("🤖 Gemini에게 코드 리팩토링을 요청합니다...");
     console.log("==================================================");
 
-    // 5. Gemini API 호출
+    // 4. 호출 준비
     const params: GenerateContentParameters = {
       model: 1 ? "gemini-2.5-pro" : "gemini-pro",
       contents: prompt,
       config: {
         systemInstruction: SYSTEM_PROMPT,
-        temperature: 0.8,
+        temperature: 0 ? 0.4 : 0.8,
         topP: 0.95,
         // maxOutputTokens: 2048, //WARN - may not work!
       },
     };
     fs.saveFile(`logs/params-${runType}${runStep ? '-' + runStep : ''}.yml`, params);
-    const result = await ai.models.generateContent(params);
 
-    // 6. 호출 결과
+    // 5. 호출 실행
+    const _genAI = async (params: GenerateContentParameters): Promise<GenerateContentResponse> => {
+      // if (1) return null as any;
+      if (0 && runType === 'simply') return await fs.readFile<any>('logs/result-simply-01.yml').then(R => {
+        const text = R?.candidates?.[0]?.content?.parts?.[0].text ?? '';
+        return { text } as any;
+      });
+      return await ai.models.generateContent(params);
+    }
+    const result = await _genAI(params);
+
     fs.saveFile(`logs/result-${runType}${runStep ? '-' + runStep : ''}.yml`, result);
-    const jsonString = result?.text?.trim();
-    const resultCode = fs.parseResult(jsonString);
+    const jsonString = result?.text?.trim() ?? '';
+    const resultCode = jsonString == '' ? '' : fs.parseResult(jsonString);
 
     // 6. 결과 출력
     console.log("--------------------------------------------------");
@@ -78,17 +83,23 @@ async function refactorCode(args: string[]) {
     console.log("==================================================");
 
     // 파일 저장.
-    if (!resultCode) {
+    if (resultCode === '') {
+      console.log("WARN! 리팩토링된 코드가 비어있습니다.");
+    } else if (!resultCode) {
       throw new Error("리팩토링된 코드가 없습니다.");
     } else if (typeof resultCode === 'string' && runStep) {
       if (runStep === 1) await fs.saveCode('serviceCode', resultCode);
       else if (runStep === 2) await fs.saveCode('apiCode', resultCode);
       else throw new Error(`Unknown runStep: ${runStep}`);
     } else if (typeof resultCode === 'object') {
-      if (resultCode.serviceCode) await fs.saveCode('serviceCode', resultCode.serviceCode);
-      if (resultCode.typeCode) await fs.saveCode('typeCode', resultCode.typeCode);
+      //* update frontend
+      if (resultCode.apiType) await fs.saveCode('apiType', resultCode.apiType);
       if (resultCode.apiCode) await fs.saveCode('apiCode', resultCode.apiCode);
+      if (resultCode.apiService) await fs.saveCode('apiService', resultCode.apiService);
+      //* update backend
+      if (resultCode.appType) await fs.saveCode('appType', resultCode.appType);
       if (resultCode.appCode) await fs.saveCode('appCode', resultCode.appCode);
+      if (resultCode.appService) await fs.saveCode('appService', resultCode.appService);
     }
     
     const $usage = result?.usageMetadata;

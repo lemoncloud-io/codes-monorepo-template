@@ -20,6 +20,7 @@ APP_DIR="sample/$APP_NAME"
 APP_SERVICES="$APP_DIR/services"
 APP_TYPES="$APP_DIR/types.ts"
 BACKEND_SERVICES="$BACKEND_DIR/src/services"
+BACKEND_UTILITIES="$BACKEND_DIR/src/utils"
 
 FRONTEN_DIR="apps/frontend"
 FRONTEN_SOURCE="$FRONTEN_DIR/src"
@@ -59,6 +60,11 @@ if [ -f "$APP_TYPES" ]; then
 else
   echo "Types file not exist → $APP_SERVICES"
 fi
+if [ -d "$APP_DIR/utils" ]; then
+  cp -rf "$APP_DIR/utils/" "./$BACKEND_UTILITIES/"
+  echo "Copy utils folder successful!"
+  ls "$BACKEND_UTILITIES" 2>/dev/null || echo "WARN! Copy to backend/utils failed."
+fi
 
 
 # 3. types.ts 파일 복사
@@ -75,6 +81,11 @@ if [ -d "$APP_DIR/services" ]; then
   echo "Copy services folder successful!"
   ls "$FRONTEN_SOURCE/services" 2>/dev/null || echo "WARN! Copy to frontend/services failed."
 fi
+if [ -d "$APP_DIR/utils" ]; then
+  cp -rf "$APP_DIR/utils/" "./$FRONTEN_SOURCE/utils/"
+  echo "Copy utils folder successful!"
+  ls "$FRONTEN_SOURCE/utils" 2>/dev/null || echo "WARN! Copy to frontend/utils failed."
+fi
 if [ -f "$APP_DIR/App.tsx" ]; then
   cp -rf "$APP_DIR/App.tsx" "./$FRONTEN_SOURCE/"
   echo "Copy App.tsx successful!"
@@ -84,6 +95,11 @@ if [ -f "$APP_DIR/index.tsx" ]; then
   cp -rf "$APP_DIR/index.tsx" "./$FRONTEN_SOURCE/"
   echo "Copy index.tsx successful!"
   ls "$FRONTEN_SOURCE/index.tsx" 2>/dev/null || echo "WARN! Copy to frontend/index.tsx failed."
+fi
+if [ -f "$APP_DIR/constants.ts" ]; then
+  cp -rf "$APP_DIR/constants.ts" "./$FRONTEN_SOURCE/"
+  echo "Copy constants.ts successful!"
+  ls "$FRONTEN_SOURCE/constants.ts" 2>/dev/null || echo "WARN! Copy to frontend/constants.ts failed."
 fi
 if [ -f "$APP_DIR/index.html" ]; then
   cp -rf "$APP_DIR/index.html" "./$FRONTEN_SOURCE/../index.html"

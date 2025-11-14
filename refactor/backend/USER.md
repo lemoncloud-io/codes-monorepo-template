@@ -64,13 +64,13 @@
 @apps/backend/src/services/geminiService.ts
 
 ```typescript
-{{{serviceCode}}}
+{{{apiService}}}
 ```
 
 @apps/backend/src/services/types.ts
 
 ```typescript
-{{{typeCode}}}
+{{{apiType}}}
 ```
 
 @apps/backend/src/api/hello-api.ts
