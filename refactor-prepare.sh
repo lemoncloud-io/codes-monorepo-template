@@ -96,6 +96,11 @@ if [ -f "$APP_DIR/index.tsx" ]; then
   echo "Copy index.tsx successful!"
   ls "$FRONTEN_SOURCE/index.tsx" 2>/dev/null || echo "WARN! Copy to frontend/index.tsx failed."
 fi
+if [ -f "$APP_DIR/constants.ts" ]; then
+  cp -rf "$APP_DIR/constants.ts" "./$FRONTEN_SOURCE/"
+  echo "Copy constants.ts successful!"
+  ls "$FRONTEN_SOURCE/constants.ts" 2>/dev/null || echo "WARN! Copy to frontend/constants.ts failed."
+fi
 if [ -f "$APP_DIR/index.html" ]; then
   cp -rf "$APP_DIR/index.html" "./$FRONTEN_SOURCE/../index.html"
   echo "Copy index.html successful!"

@@ -27,7 +27,7 @@ const apiClient = axios.create({
         // 여기에 Authorization 헤더 등을 추가할 수 있습니다.
         'Authorization': API_TOKEN ? `Bearer ${API_TOKEN}` : undefined,
     },
-    timeout: 5000, // 요청 타임아웃 설정 (5초)
+    timeout: 35000, // 요청 타임아웃 설정 (35초)
 });
 
 // 요청 인터셉터: 모든 요청이 보내지기 전에 실행됩니다.
