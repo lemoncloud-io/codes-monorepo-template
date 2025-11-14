@@ -64,14 +64,14 @@ export const $fs = (scope: string, _baseRoot: string = __dirname) => {
    * 파일 맵 정의
    */
   const fileMap: Record<string, string> = {
-    serviceCode: "apps/backend/src/services/geminiService.ts",
-    typeCode: "apps/backend/src/services/types.ts",
-    apiCode: "apps/backend/src/api/hello-api.ts",
+    //* for app frontend
+    appType: "apps/frontend/src/types.ts",
+    appService: "apps/frontend/src/services/geminiService.ts",
     appCode: "apps/frontend/src/App.tsx",
-  };
-  if (scope == 'frontend'){
-    fileMap.serviceCode = "apps/frontend/src/services/geminiService.ts";
-    fileMap.typeCode = "apps/frontend/src/types.ts";
+    //* for api backend
+    apiService: "apps/backend/src/services/geminiService.ts",
+    apiType: "apps/backend/src/services/types.ts",
+    apiCode: "apps/backend/src/api/hello-api.ts",
   }
 
   type FileName = keyof typeof fileMap;

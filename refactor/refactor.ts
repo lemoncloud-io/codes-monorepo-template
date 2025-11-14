@@ -61,7 +61,10 @@ async function refactorCode(args: string[]) {
 
     // 5. 호출 실행
     const _genAI = async (params: GenerateContentParameters): Promise<GenerateContentResponse> => {
-      // if (runType === 'simply') return null as any; // IGNORE
+      if (runType === 'simply') return await fs.readFile<any>('logs/result-simply-01.yml').then(R => {
+        const text = R?.candidates?.[0]?.content?.parts?.[0].text ?? '';
+        return { text } as any;
+      });
       return await ai.models.generateContent(params);
     }
     const result = await _genAI(params);
@@ -85,10 +88,14 @@ async function refactorCode(args: string[]) {
       else if (runStep === 2) await fs.saveCode('apiCode', resultCode);
       else throw new Error(`Unknown runStep: ${runStep}`);
     } else if (typeof resultCode === 'object') {
-      if (resultCode.serviceCode) await fs.saveCode('serviceCode', resultCode.serviceCode);
-      if (resultCode.typeCode) await fs.saveCode('typeCode', resultCode.typeCode);
+      //* update frontend
+      if (resultCode.apiType) await fs.saveCode('apiType', resultCode.apiType);
       if (resultCode.apiCode) await fs.saveCode('apiCode', resultCode.apiCode);
+      if (resultCode.apiService) await fs.saveCode('apiService', resultCode.apiService);
+      //* update backend
+      if (resultCode.appType) await fs.saveCode('appType', resultCode.appType);
       if (resultCode.appCode) await fs.saveCode('appCode', resultCode.appCode);
+      if (resultCode.appService) await fs.saveCode('appService', resultCode.appService);
     }
     
     const $usage = result?.usageMetadata;
