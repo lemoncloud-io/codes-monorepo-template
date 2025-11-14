@@ -43,7 +43,7 @@ if [ -f "$APP_SERVICES/geminiService.ts" ]; then
   cp -rf "$APP_SERVICES/" "./$BACKEND_SERVICES/"
   cp -rf "$APP_SERVICES/" "./$FRONTEN_SERVICES/"
   echo "Copy gemini service file successful!"
-  ls "$BACKEND_SERVICE/geminiService.ts" 2>/dev/null || echo "Copy to backend failed."
+  ls "$BACKEND_SERVICES/geminiService.ts" 2>/dev/null || echo "Copy to backend failed."
   ls "$FRONTEN_SERVICES/geminiService.ts" 2>/dev/null || echo "Copy to frontend failed."
 else
   echo "Gemini Service file not exist → $APP_SERVICES"
@@ -56,7 +56,7 @@ echo "[3/4] Copying types.ts file..."
 if [ -f "$APP_TYPES" ]; then
   cp "$APP_TYPES" "./$BACKEND_SERVICES/types.ts"
   echo "Copy types file successful! (backend, frontend)"
-  ls "$BACKEND_SERVICE/types.ts" 2>/dev/null || echo "Copy to backend failed."
+  ls "$BACKEND_SERVICES/types.ts" 2>/dev/null || echo "Copy to backend failed."
 else
   echo "Types file not exist → $APP_SERVICES"
 fi
@@ -105,7 +105,16 @@ if [ -f "$APP_DIR/index.html" ]; then
   cp -rf "$APP_DIR/index.html" "./$FRONTEN_SOURCE/../index.html"
   echo "Copy index.html successful!"
   ls "$FRONTEN_SOURCE/../index.html" 2>/dev/null || echo "WARN! Copy to frontend/index.html failed."
-  sed -i '' 's#/index\.tsx#/src/index.tsx#g' "$FRONTEN_SOURCE/../index.html"
+  # sed -i 호환성(GNU/BSD/BusyBox) 이슈: 임시 파일로 대체 수행
+  HTML_FILE="$FRONTEN_SOURCE/../index.html"
+  TMP_FILE="${HTML_FILE}.tmp"
+  echo "replace index.tsx to /src/index.tsx in $HTML_FILE"
+  # 다양한 표기("/index.tsx", "index.tsx", "./index.tsx") 모두를 /src/index.tsx 로 통일
+  sed \
+    -e 's|/index.tsx|/src/index.tsx|g' \
+    -e 's|"index.tsx"|"/src/index.tsx"|g' \
+    -e 's|"\./index.tsx"|"/src/index.tsx"|g' \
+    "$HTML_FILE" > "$TMP_FILE" && mv "$TMP_FILE" "$HTML_FILE"
 fi
 if [ -f "$APP_DIR/types.ts" ]; then
   cp -rf "$APP_DIR/types.ts" "./$FRONTEN_SOURCE/"
