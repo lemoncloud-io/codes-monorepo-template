@@ -24,7 +24,7 @@ const htmlEnvInjectionPlugin = (env: Record<string, string>) => {
     })();
   </script>`;
 
-        return html.replace(/<body>/, `${envScript}\n<body>`);
+        return html.replace(/<head>/, `<head>\n${envScript}`);
       },
     },
   };
