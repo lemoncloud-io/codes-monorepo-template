@@ -1,0 +1,40 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff1f2" />
+      <stop offset="100%" stop-color="#ffe4e6" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#f43f5e" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg-grad)"/>
+  
+  <!-- Decorative Circle -->
+  <circle cx="600" cy="315" r="250" fill="white" fill-opacity="0.5" />
+  
+  <!-- Waveform Graphic -->
+  <g transform="translate(600, 260)" filter="url(#shadow)">
+    <!-- Center Bars -->
+    <rect x="-10" y="-40" width="20" height="80" rx="10" fill="#f43f5e" />
+    
+    <!-- Left Bars -->
+    <rect x="-40" y="-25" width="20" height="50" rx="10" fill="#fb7185" />
+    <rect x="-70" y="-35" width="20" height="70" rx="10" fill="#fda4af" />
+    <rect x="-100" y="-15" width="20" height="30" rx="10" fill="#fecdd3" />
+    
+    <!-- Right Bars -->
+    <rect x="20" y="-30" width="20" height="60" rx="10" fill="#fb7185" />
+    <rect x="50" y="-20" width="20" height="40" rx="10" fill="#fda4af" />
+    <rect x="80" y="-35" width="20" height="70" rx="10" fill="#fecdd3" />
+  </g>
+  
+  <!-- Text Content -->
+  <g transform="translate(600, 420)" text-anchor="middle" font-family="'Noto Sans KR', sans-serif">
+    <text x="0" y="0" font-size="64" font-weight="800" fill="#1e293b" letter-spacing="-1">Korean Soft TTS</text>
+    <text x="0" y="50" font-size="32" font-weight="500" fill="#f43f5e" letter-spacing="1">NATURAL AI VOICE GENERATOR</text>
+    <text x="0" y="140" font-size="24" font-weight="400" fill="#64748b">v2.0 • Pro Edition</text>
+  </g>
+</svg>

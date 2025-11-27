@@ -1,0 +1,25 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fb7185" />
+      <stop offset="100%" stop-color="#e11d48" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background Container -->
+  <rect x="0" y="0" width="512" height="512" rx="128" fill="url(#grad)" />
+  
+  <!-- Waveform Bars -->
+  <g fill="white" transform="translate(256, 256)">
+    <!-- Center -->
+    <rect x="-30" y="-120" width="60" height="240" rx="30" />
+    
+    <!-- Right Side -->
+    <rect x="50" y="-80" width="60" height="160" rx="30" opacity="0.9" />
+    <rect x="130" y="-40" width="60" height="80" rx="30" opacity="0.8" />
+    
+    <!-- Left Side -->
+    <rect x="-110" y="-80" width="60" height="160" rx="30" opacity="0.9" />
+    <rect x="-190" y="-40" width="60" height="80" rx="30" opacity="0.8" />
+  </g>
+</svg>

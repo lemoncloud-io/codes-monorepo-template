@@ -12,6 +12,7 @@ import { View, CoreModel } from 'lemon-model';
 import { $T, $U, _log, NextHandler, GeneralWEBController } from 'lemon-core';
 import { TestView } from '../service/views';
 import $service, { HelloService } from '../service/service';
+import { estimateAudioDuration, generateSpeechFromText } from '../services/geminiService';
 const NS = $U.NS('hello', 'yellow'); // NAMESPACE TO BE PRINTED.
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -83,6 +84,29 @@ export class HelloAPIController extends GeneralWEBController {
 
         // otherwise, error.
         throw new Error(`@id[${id}] is invalid - ${errScope}`);
+    };
+
+    /**
+     * post generate hello
+     *
+     * ```sh
+     * $ http POST ':8000/hello/generate-speech-from-text/generate' text='hello world'
+     * $ http POST ':8000/hello/estimate-audio-duration/generate' text='hello world' speed='normal'
+     */
+    public doPostGenerate: NextHandler = async (id, param, body, context) => {
+        const errScope = `doPostGenerate(${this.type()}/${id ?? ''})`;
+        _log(NS, `${errScope} ...`);
+        id = id === '0' ? '' : $T.S2(id);
+        if (!id) throw new Error(`@id[${id}] is required - ${errScope}`);
+
+        switch (id) {
+            case 'generate-speech-from-text':
+                return await generateSpeechFromText(body);
+            case 'estimate-audio-duration':
+                return estimateAudioDuration(body);
+            default:
+                throw new Error(`404 NOT FOUND - unsupported type[${id}] @${errScope}`);
+        }
     };
 }
 

@@ -1,0 +1,5 @@
+{
+  "name": "Korean Soft TTS",
+  "description": "A text-to-speech application converting Korean text into a soft, middle-aged female voice using Gemini API.",
+  "requestFramePermissions": []
+}
