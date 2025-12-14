@@ -1,8 +1,8 @@
 #!/bin/sh
-# refactor-prepare.sh
+# prepare.sh
 # - 이 스크립트는 백엔드 코드 리팩토링을 준비하기 위한 사전 단계를 수행합니다.
-# - 사용법: ./refactor-prepare.sh <name-in-sample-app>
-# - 예시: ./refactor-prepare.sh ai-blog-title-generator
+# - 사용법: ./prepare.sh <name-in-sample-app>
+# - 예시: ./prepare.sh ai-blog-title-generator
 
 set -e  # 오류 발생 시 즉시 종료
 
@@ -52,6 +52,8 @@ fi
 # 3. types.ts 파일 복사
 # ----------------------------------------------------------
 echo "[3/4] Copying types.ts file..."
+mkdir -p "$BACKEND_SERVICES"
+mkdir -p "$FRONTEN_SERVICES"
 
 if [ -f "$APP_TYPES" ]; then
   cp "$APP_TYPES" "./$BACKEND_SERVICES/types.ts"
