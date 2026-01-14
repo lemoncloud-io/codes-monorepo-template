@@ -41,7 +41,10 @@
 - `types.ts`은 참고용으로 원본 그대로 유지함 -> **아무것도 출력하지 않습니다.** (빈 응답)
 
 - **선택 파일:** `apps/frontend/src/App.tsx`
-- `geminiService.ts` 내 함수의 import 경로가 `services/geminiService`로 올바른지 확인한 후 올바르게 import 되었는지 확인하세요.(`from './services/gemini';`처럼 잘못되어있는지 않은지 확인하세요.) -> **아무것도 출력하지 않습니다.** (빈 응답)
+- **(import 경로 주의 - 중요!)** `geminiService` import 경로는 **절대** `'./services/geminiService'`로 작성합니다.
+  - ✅ 올바른 경로: `import { 함수명 } from './services/geminiService';`
+  - ❌ 잘못된 경로: `import { 함수명 } from './geminiService';` ← **사용 금지**
+- 위 경로 확인 후 -> **아무것도 출력하지 않습니다.** (빈 응답)
 
 - **원본 함수 파라미터 검증:**  
 - 절대! 원본 함수의 입력과 출력은 그대로 유지하여야 하며, `apiClient`를 이용한 호출로 변경합니다.
