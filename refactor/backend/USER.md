@@ -32,7 +32,26 @@
 - **필수 파일:** `apps/backend/src/services/geminiService.ts`
 - 파일이 존재하지 않거나 메인 함수 자체가 없으면 -> **아무것도 출력하지 않습니다.** (빈 응답)
 - `API_KEY`를 환경변수에서 이용할 경우, `GEMINI_API_KEY`의 환경변수로도 이용할 수 있도록 변경 (ex: `process.env.API_KEY = process.env.API_KEY || process.env.GEMINI_API_KEY;`)
-- **(SDK 버전 주의)** `@google/genai` 패키지는 `GoogleGenAI`를 export합니다. 구버전 패턴인 `GoogleGenerativeAI`가 있으면 반드시 `GoogleGenAI`로 변경하세요. (예: `import { GoogleGenAI } from "@google/genai"`)
+- **(SDK 버전 주의)** `@google/genai` 패키지는 `GoogleGenAI`를 export합니다. 구버전 패턴(`@google/generative-ai`)이 있으면 반드시 신버전 패턴으로 변경하세요.
+
+  **[구버전→신버전 변환 규칙]**
+  | 구버전 (`@google/generative-ai`) | 신버전 (`@google/genai`) |
+  |--------------------------------|-------------------------|
+  | `import { GoogleGenerativeAI }` | `import { GoogleGenAI }` |
+  | `new GoogleGenerativeAI(apiKey)` | `new GoogleGenAI({ apiKey })` |
+  | `genAI.getGenerativeModel({ model })` | ❌ 사용하지 않음 |
+  | `model.generateContent(prompt)` | `ai.models.generateContent({ model, contents })` |
+
+  **[GoogleGenAI 사용예제]**
+  ```ts
+  import { GoogleGenAI } from "@google/genai";
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: '#prompt to say hello',
+  });
+  console.log(response.text.trim());
+  ```
 
 - **선택 파일:** `apps/backend/src/services/types.ts`  
 - 파일이 존재하지 않는 경우 → **상단에 `./types`타입 import 코드를 추가하지 않으며**, `$param` 구조 리팩토링만 수행합니다.

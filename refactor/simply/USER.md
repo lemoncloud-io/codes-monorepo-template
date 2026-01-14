@@ -135,7 +135,15 @@ apps
 > 백엔드에서의 리팩토링 주요 작업은 `hello-api.ts` 와 `geminiService.ts` 코드내 함수의 연결입니다.
 > **절대** 반드시 `@google/genai` 패키지의 `GoogleGenAI`를 이용하는 기존 코드는 그대로 유지합니다 → **GoogleGenAI() 사용 코드 유지**
 > **주의** `geminiService.ts` 코드내 함수들의 파라미터 변경만 적용합니다.
-> **(SDK 버전 주의)** `@google/genai` 패키지는 `GoogleGenAI`를 export합니다. 구버전 패턴인 `GoogleGenerativeAI`가 있으면 반드시 `GoogleGenAI`로 변경하세요.
+> **(SDK 버전 주의)** `@google/genai` 패키지는 `GoogleGenAI`를 export합니다. 구버전 패턴(`@google/generative-ai`)이 있으면 반드시 신버전 패턴으로 변경하세요.
+
+  **[구버전→신버전 변환 규칙]**
+  | 구버전 (`@google/generative-ai`) | 신버전 (`@google/genai`) |
+  |--------------------------------|-------------------------|
+  | `import { GoogleGenerativeAI }` | `import { GoogleGenAI }` |
+  | `new GoogleGenerativeAI(apiKey)` | `new GoogleGenAI({ apiKey })` |
+  | `genAI.getGenerativeModel({ model })` | ❌ 사용하지 않음 |
+  | `model.generateContent(prompt)` | `ai.models.generateContent({ model, contents })` |
 
   **[GoogleGenAI 사용예제]**
 
