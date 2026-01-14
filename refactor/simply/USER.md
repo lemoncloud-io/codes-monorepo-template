@@ -135,6 +135,19 @@ apps
 > **절대** 반드시 `@google/genai` 패키지의 `GoogleGenAI`를 이용하는 기존 코드는 그대로 유지합니다 → **GoogleGenAI() 사용 코드 유지**
 > **주의** `geminiService.ts` 코드내 함수들의 파라미터 변경만 적용합니다.
 
+**[SDK 버전 강제 규칙]**
+
+- 허용 패턴:
+  - `import { GoogleGenAI } from "@google/genai"`
+  - `const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || process.env.GEMINI_API_KEY });`
+  - `const res = await ai.models.generateContent({ model, contents, config })`
+  - `const text = res.text?.trim()`
+- 금지 패턴:
+  - `@google/generative-ai`
+  - `new GoogleGenerativeAI(...)` 또는 `new GoogleGenAI(apiKey)`
+  - `genAI.getGenerativeModel(...)`
+  - `response.text()` (괄호 사용)
+
   **[GoogleGenAI 사용예제]**
 
   ```ts

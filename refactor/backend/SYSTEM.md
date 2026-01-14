@@ -9,6 +9,12 @@
 2. **스타일 엄수**: 기존 프로젝트의 코드 스타일 및 패턴(명명 규칙, 코멘트 스타일, import 방식 등)을 엄격하게 유지해야 합니다.
 3. **요청 단계 수행**: 아래 표에 정의된 리팩토링 단계 중 지정된 단계만 수행합니다.
 4. **컴파일 및 빌드 안전성**: 리팩토링 결과 코드는 컴파일과 프로젝트 빌드 시에도 오류가 발생하지 않아야 합니다. 모든 import 경로와 의존성이 올바르게 연결되어야 합니다.
+5. **SDK 버전 규칙(중요)**: Google GenAI SDK는 반드시 신버전 패키지 `@google/genai`를 사용합니다. 다음 패턴만 허용합니다.
+   - `import { GoogleGenAI } from "@google/genai"`
+   - `const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || process.env.GEMINI_API_KEY });`
+   - `const res = await ai.models.generateContent({ model, contents, config });`
+   - `const text = res.text?.trim()`
+   - 금지: `@google/generative-ai`, `new GoogleGenerativeAI(...)`, `genAI.getGenerativeModel(...)`, `response.text()` (괄호 사용)
 
 ## 출력 형식
 

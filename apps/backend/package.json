@@ -17,6 +17,7 @@
         "deploy": "npm run start"
     },
     "dependencies": {
+        "@google/genai": "^1.35.0",
         "lemon-core": "^4.0.7",
         "lemon-model": "^1.0.6"
     },
