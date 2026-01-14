@@ -47,6 +47,10 @@
   | `response.text()` | `response.text` (메서드→속성) |
   | `gemini-pro`, `gemini-1.5-pro` 등 | `gemini-2.5-flash` (권장 모델) |
 
+  **(구문 주의)** import 경로 및 문자열은 반드시 **일반 따옴표(`'` 또는 `"`)** 를 사용하세요. 백틱(\`)은 import 경로에 사용 금지!
+  - ✅ `import { GoogleGenAI } from "@google/genai";`
+  - ❌ `import { GoogleGenAI } from \`@google/genai\`;` ← **구문 에러 발생**
+
   **[GoogleGenAI 사용예제]**
 
   ```ts
