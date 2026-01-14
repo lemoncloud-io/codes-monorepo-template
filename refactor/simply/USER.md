@@ -128,6 +128,7 @@ apps
 
 - 보통은 `geminiService.ts`내의 함수 사용을 참고용을 -> **아무것도 출력하지 않습니다.** (빈 응답)
 - 단, `geminiService.ts` 함수의 파라미터 변경시 호출 부분에서 함께 변경 필요함!
+- **(import 경로 주의)** import 경로는 반드시 `'./services/geminiService'`로 작성합니다. (예시: `import { 생성한함수 } from './services/geminiService';`)
 
 ### 작업 2단계: 백엔드
 
