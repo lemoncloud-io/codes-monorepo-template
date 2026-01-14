@@ -128,9 +128,10 @@ apps
 
 - 보통은 `geminiService.ts`내의 함수 사용을 참고용을 -> **아무것도 출력하지 않습니다.** (빈 응답)
 - 단, `geminiService.ts` 함수의 파라미터 변경시 호출 부분에서 함께 변경 필요함!
-- **(import 경로 주의 - 중요!)** `geminiService` import 경로는 **절대** `'./services/geminiService'`로 작성합니다.
-  - ✅ 올바른 경로: `import { 함수명 } from './services/geminiService';`
-  - ❌ 잘못된 경로: `import { 함수명 } from './geminiService';` ← **사용 금지**
+
+> **⚠️ [import 경로 필수 확인]** `App.tsx`에서 `geminiService` import 시 경로를 **반드시** 확인하세요!
+> - ✅ **올바른 경로**: `import { 함수명 } from './services/geminiService';`
+> - ❌ **잘못된 경로**: `import { 함수명 } from './geminiService';` ← **빌드 에러 발생!**
 
 ### 작업 2단계: 백엔드
 
