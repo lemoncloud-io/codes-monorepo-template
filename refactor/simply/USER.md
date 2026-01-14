@@ -150,6 +150,7 @@ apps
   | `generationConfig: { ... }` | `config: { ... }` |
   | `result.response` | ❌ 사용하지 않음 (response 직접 반환) |
   | `response.text()` | `response.text` (메서드→속성) |
+  | `gemini-pro`, `gemini-1.5-pro` 등 | `gemini-2.5-flash` (권장 모델) |
 
   **[GoogleGenAI 사용예제]**
 
