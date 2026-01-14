@@ -35,22 +35,28 @@
 - **(SDK 버전 주의)** `@google/genai` 패키지는 `GoogleGenAI`를 export합니다. 구버전 패턴(`@google/generative-ai`)이 있으면 반드시 신버전 패턴으로 변경하세요.
 
   **[구버전→신버전 변환 규칙]**
+
   | 구버전 (`@google/generative-ai`) | 신버전 (`@google/genai`) |
   |--------------------------------|-------------------------|
   | `import { GoogleGenerativeAI }` | `import { GoogleGenAI }` |
   | `new GoogleGenerativeAI(apiKey)` | `new GoogleGenAI({ apiKey })` |
   | `genAI.getGenerativeModel({ model })` | ❌ 사용하지 않음 |
   | `model.generateContent(prompt)` | `ai.models.generateContent({ model, contents })` |
+  | `generationConfig: { ... }` | `config: { ... }` |
+  | `result.response` | ❌ 사용하지 않음 (response 직접 반환) |
+  | `response.text()` | `response.text` (메서드→속성) |
 
   **[GoogleGenAI 사용예제]**
+
   ```ts
   import { GoogleGenAI } from "@google/genai";
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash",
-    contents: '#prompt to say hello',
+    contents: [{ role: "user", parts: [{ text: "Hello" }] }],
+    config: { responseMimeType: "application/json" },  // generationConfig 대신 config 사용
   });
-  console.log(response.text.trim());
+  console.log(response.text);  // .text() 가 아닌 .text 속성 사용
   ```
 
 - **선택 파일:** `apps/backend/src/services/types.ts`  
