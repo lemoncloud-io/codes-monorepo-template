@@ -29,9 +29,10 @@
 **[사전 검증 (Preflight) — 단계별 필수 조건 및 불충족 시 동작]**
 ● 1단계 (Service 리팩토링)
 
-- **필수 파일:** `apps/backend/src/services/geminiService.ts`  
+- **필수 파일:** `apps/backend/src/services/geminiService.ts`
 - 파일이 존재하지 않거나 메인 함수 자체가 없으면 -> **아무것도 출력하지 않습니다.** (빈 응답)
 - `API_KEY`를 환경변수에서 이용할 경우, `GEMINI_API_KEY`의 환경변수로도 이용할 수 있도록 변경 (ex: `process.env.API_KEY = process.env.API_KEY || process.env.GEMINI_API_KEY;`)
+- **(SDK 버전 주의)** `@google/genai` 패키지는 `GoogleGenAI`를 export합니다. 구버전 패턴인 `GoogleGenerativeAI`가 있으면 반드시 `GoogleGenAI`로 변경하세요. (예: `import { GoogleGenAI } from "@google/genai"`)
 
 - **선택 파일:** `apps/backend/src/services/types.ts`  
 - 파일이 존재하지 않는 경우 → **상단에 `./types`타입 import 코드를 추가하지 않으며**, `$param` 구조 리팩토링만 수행합니다.
