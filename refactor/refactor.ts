@@ -51,7 +51,7 @@ async function refactorCode(args: string[]) {
 
     // 4. 호출 준비
     const params: GenerateContentParameters = {
-      model: 1 ? "gemini-3-pro" : "gemini-2.5-pro",
+      model: 1 ? "gemini-2.5-pro" : "gemini-pro",
       contents: prompt,
       config: {
         systemInstruction: SYSTEM_PROMPT,
