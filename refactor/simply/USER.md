@@ -126,17 +126,16 @@ apps
 
 3. `apps/frontend/src/App.tsx` 파일 작업
 
-- 보통은 `geminiService.ts`내의 함수 사용을 참고용을 -> **아무것도 출력하지 않습니다.** (빈 응답)
-- 단, `geminiService.ts` 함수의 파라미터 변경시 호출 부분에서 함께 변경 필요함!
-
-> **🔍 [App.tsx 중점 확인]** `App.tsx` 파일의 모든 import 경로를 우선적으로 검토하세요!
->
-> **⚠️ [올바른 import 방법 - 프로젝트 내 모든 파일 간 import에 적용]**
-> ※ 라이브러리 import(`react`, `@google/genai` 등)는 해당 없음. **프로젝트 내 파일 간 import만 적용!**
-> 1. import하려는 **메서드명 + 파일명**으로 프로젝트 내 검색
-> 2. 메서드가 실제로 해당 파일에 존재하는지 확인
-> 3. 존재하면, **현재 파일 기준 상대 경로**를 계산하여 import
-> 4. 예시: `App.tsx`에서 `services/geminiService.ts`의 함수 import → `'./services/geminiService'`
+- **선택 파일:** `apps/frontend/src/App.tsx`
+> **`apps/frontend/src/App.tsx` 파일이 존재하는 경우 import 경로 필수 확인**
+> - ✅ **올바른 경로**: `import { 함수명 } from './services/geminiService';`
+> - ❌ **잘못된 경로**: `import { 함수명 } from './geminiService';` ← **빌드 에러 발생!**
+- App.tsx 파일 내 모든 import 경로를 다음 스텝을 따라 우선적으로 검토하세요! (※ 라이브러리 import는 해당 없음. 프로젝트 내 파일 간 import만 적용)
+  1. import하려는 **메서드명 + 파일명**으로 프로젝트 내 검색
+  2. 메서드가 실제로 해당 파일에 존재하는지 확인
+  3. 존재하면, **현재 파일 기준 상대 경로**를 계산하여 import
+  4. 예시: `App.tsx`에서 `services/geminiService.ts`의 함수 import → `'./services/geminiService'`
+- 위 경로 확인 후 -> **아무것도 출력하지 않습니다.** (빈 응답)
 
 ### 작업 2단계: 백엔드
 
