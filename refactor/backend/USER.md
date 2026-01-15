@@ -45,7 +45,11 @@
   | `generationConfig: { ... }` | `config: { ... }` |
   | `result.response` | ❌ 사용하지 않음 (response 직접 반환) |
   | `response.text()` | `response.text` (메서드→속성) |
-  | `gemini-pro`, `gemini-1.5-pro` 등 | `gemini-2.5-flash` (권장 모델) |
+  | `gemini-pro`, `gemini-1.5-flash` 등 | `gemini-2.5-flash` 이상 또는 model 파라미터 생략 |
+  | `role: "system"` 등 잘못된 role | `role: "user"` 또는 `role: "model"` 만 허용 |
+
+  **(모델명 필수)** `gemini-1.5-flash`, `gemini-pro` 등 구버전 모델명은 **404 에러** 발생! `gemini-2.5-flash` 이상 사용하거나 model 파라미터를 생략하세요 (default 사용).
+  **(role 필수)** contents의 role은 `"user"` 또는 `"model"`만 허용됩니다. `"system"` 등 다른 값은 **400 에러** 발생!
 
   **(구문 주의)** import 경로 및 문자열은 반드시 **일반 따옴표(`'` 또는 `"`)** 를 사용하세요. 백틱(\`)은 import 경로에 사용 금지!
   - ✅ `import { GoogleGenAI } from "@google/genai";`
