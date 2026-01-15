@@ -44,7 +44,7 @@
 > **`apps/frontend/src/App.tsx` 파일이 존재하는 경우 import 경로 필수 확인**
 > - ✅ **올바른 경로**: `import { 함수명 } from './services/geminiService';`
 > - ❌ **잘못된 경로**: `import { 함수명 } from './geminiService';` ← **빌드 에러 발생!**
-- App.tsx 파일 내 모든 import 경로를 다음 스텝을 따라 우선적으로 검토하세요!
+- 필수 지침: App.tsx 파일 내 모든 import 경로를 다음 스텝을 따라 우선적으로 검토하세요!
   1. import하려는 **메서드명 + 파일명**으로 프로젝트 내 검색
   2. 메서드가 실제로 해당 파일에 존재하는지 확인
   3. 존재하면, **현재 파일 기준 상대 경로**를 계산하여 import
