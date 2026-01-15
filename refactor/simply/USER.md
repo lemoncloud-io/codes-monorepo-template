@@ -129,11 +129,12 @@ apps
 - 보통은 `geminiService.ts`내의 함수 사용을 참고용을 -> **아무것도 출력하지 않습니다.** (빈 응답)
 - 단, `geminiService.ts` 함수의 파라미터 변경시 호출 부분에서 함께 변경 필요함!
 
-> **⚠️ [import 경로 필수 확인]** `App.tsx`에서 `geminiService` import 시 경로를 **반드시** 확인하세요!
-> - ✅ **올바른 경로**: `import { 함수명 } from './services/geminiService';`
-> - ❌ **잘못된 경로**: `import { 함수명 } from './geminiService';` ← **빌드 에러 발생!**
->
-> **⚠️ [import 경로 계산]** import 추가 시 파일 구조를 확인하고, 해당 파일/메서드의 실제 위치를 찾아 올바른 상대 경로로 import하세요. (예: `src/utils/constants.ts` → `./utils/constants`)
+> **⚠️ [올바른 import 방법 - 프로젝트 내 모든 파일 간 import에 적용]**
+> ※ 라이브러리 import(`react`, `@google/genai` 등)는 해당 없음. **프로젝트 내 파일 간 import만 적용!**
+> 1. import하려는 **메서드명 + 파일명**으로 프로젝트 내 검색
+> 2. 메서드가 실제로 해당 파일에 존재하는지 확인
+> 3. 존재하면, **현재 파일 기준 상대 경로**를 계산하여 import
+> 4. 예시: `App.tsx`에서 `services/geminiService.ts`의 함수 import → `'./services/geminiService'`
 
 ### 작업 2단계: 백엔드
 
