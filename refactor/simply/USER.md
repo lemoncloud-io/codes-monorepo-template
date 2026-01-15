@@ -129,6 +129,8 @@ apps
 - 보통은 `geminiService.ts`내의 함수 사용을 참고용을 -> **아무것도 출력하지 않습니다.** (빈 응답)
 - 단, `geminiService.ts` 함수의 파라미터 변경시 호출 부분에서 함께 변경 필요함!
 
+> **🔍 [App.tsx 중점 확인]** `App.tsx` 파일의 모든 import 경로를 우선적으로 검토하세요!
+>
 > **⚠️ [올바른 import 방법 - 프로젝트 내 모든 파일 간 import에 적용]**
 > ※ 라이브러리 import(`react`, `@google/genai` 등)는 해당 없음. **프로젝트 내 파일 간 import만 적용!**
 > 1. import하려는 **메서드명 + 파일명**으로 프로젝트 내 검색
