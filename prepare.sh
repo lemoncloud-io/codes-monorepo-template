@@ -40,8 +40,10 @@ fi
 echo "[2/4] Copying geminiService.ts file..."
 
 if [ -f "$APP_SERVICES/geminiService.ts" ]; then
-  cp -rf "$APP_SERVICES/" "./$BACKEND_SERVICES/"
-  cp -rf "$APP_SERVICES/" "./$FRONTEN_SERVICES/"
+  mkdir -p "$BACKEND_SERVICES"
+  mkdir -p "$FRONTEN_SERVICES"
+  cp -rf "$APP_SERVICES/"* "./$BACKEND_SERVICES/" 2>/dev/null || true
+  cp -rf "$APP_SERVICES/"* "./$FRONTEN_SERVICES/" 2>/dev/null || true
   echo "Copy gemini service file successful!"
   ls "$BACKEND_SERVICES/geminiService.ts" 2>/dev/null || echo "Copy to backend failed."
   ls "$FRONTEN_SERVICES/geminiService.ts" 2>/dev/null || echo "Copy to frontend failed."
@@ -60,31 +62,35 @@ if [ -f "$APP_TYPES" ]; then
   echo "Copy types file successful! (backend, frontend)"
   ls "$BACKEND_SERVICES/types.ts" 2>/dev/null || echo "Copy to backend failed."
 else
-  echo "Types file not exist → $APP_SERVICES"
+  echo "Types file not exist → $APP_TYPES"
 fi
 if [ -d "$APP_DIR/utils" ]; then
-  cp -rf "$APP_DIR/utils/" "./$BACKEND_UTILITIES/"
+  mkdir -p "$BACKEND_UTILITIES"
+  cp -rf "$APP_DIR/utils/"* "./$BACKEND_UTILITIES/" 2>/dev/null || true
   echo "Copy utils folder successful!"
   ls "$BACKEND_UTILITIES" 2>/dev/null || echo "WARN! Copy to backend/utils failed."
 fi
 
 
-# 3. types.ts 파일 복사
+# 4. frontend 파일 복사
 # ----------------------------------------------------------
 echo "[4/4] Copying frontend file..."
 
 if [ -d "$APP_DIR/components" ]; then
-  cp -rf "$APP_DIR/components/" "./$FRONTEN_SOURCE/components/"
+  mkdir -p "$FRONTEN_SOURCE/components"
+  cp -rf "$APP_DIR/components/"* "./$FRONTEN_SOURCE/components/" 2>/dev/null || true
   echo "Copy components folder successful!"
   ls "$FRONTEN_SOURCE/components" 2>/dev/null || echo "WARN! Copy to frontend/components failed."
 fi
 if [ -d "$APP_DIR/utils" ]; then
-  cp -rf "$APP_DIR/utils/" "./$FRONTEN_SOURCE/utils/"
+  mkdir -p "$FRONTEN_SOURCE/utils"
+  cp -rf "$APP_DIR/utils/"* "./$FRONTEN_SOURCE/utils/" 2>/dev/null || true
   echo "Copy utils folder successful!"
   ls "$FRONTEN_SOURCE/utils" 2>/dev/null || echo "WARN! Copy to frontend/utils failed."
 fi
 if [ -d "$APP_DIR/pages" ]; then
-  cp -rf "$APP_DIR/pages/" "./$FRONTEN_SOURCE/pages/"
+  mkdir -p "$FRONTEN_SOURCE/pages"
+  cp -rf "$APP_DIR/pages/"* "./$FRONTEN_SOURCE/pages/" 2>/dev/null || true
   echo "Copy pages folder successful!"
   ls "$FRONTEN_SOURCE/pages" 2>/dev/null || echo "WARN! Copy to frontend/pages failed."
 fi
