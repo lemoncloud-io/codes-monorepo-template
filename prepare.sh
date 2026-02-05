@@ -47,8 +47,16 @@ if [ -f "$APP_SERVICES/geminiService.ts" ]; then
   echo "Copy gemini service file successful!"
   ls "$BACKEND_SERVICES/geminiService.ts" 2>/dev/null || echo "Copy to backend failed."
   ls "$FRONTEN_SERVICES/geminiService.ts" 2>/dev/null || echo "Copy to frontend failed."
+elif [ -d "$APP_SERVICES" ]; then
+  mkdir -p "$BACKEND_SERVICES"
+  mkdir -p "$FRONTEN_SERVICES"
+  cp -rf "$APP_SERVICES/"* "./$BACKEND_SERVICES/" 2>/dev/null || true
+  cp -rf "$APP_SERVICES/"* "./$FRONTEN_SERVICES/" 2>/dev/null || true
+  echo "Copy services folder successful!"
+  ls "$BACKEND_SERVICES" 2>/dev/null || echo "Copy to backend failed."
+  ls "$FRONTEN_SERVICES" 2>/dev/null || echo "Copy to frontend failed."
 else
-  echo "Gemini Service file not exist → $APP_SERVICES"
+  echo "Services folder not exist → $APP_SERVICES"
 fi
 
 # 3. types.ts 파일 복사
