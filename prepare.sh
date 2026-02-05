@@ -78,11 +78,6 @@ if [ -d "$APP_DIR/components" ]; then
   echo "Copy components folder successful!"
   ls "$FRONTEN_SOURCE/components" 2>/dev/null || echo "WARN! Copy to frontend/components failed."
 fi
-if [ -d "$APP_DIR/services" ]; then
-  cp -rf "$APP_DIR/services/" "./$FRONTEN_SOURCE/services/"
-  echo "Copy services folder successful!"
-  ls "$FRONTEN_SOURCE/services" 2>/dev/null || echo "WARN! Copy to frontend/services failed."
-fi
 if [ -d "$APP_DIR/utils" ]; then
   cp -rf "$APP_DIR/utils/" "./$FRONTEN_SOURCE/utils/"
   echo "Copy utils folder successful!"
