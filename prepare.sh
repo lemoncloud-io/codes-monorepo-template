@@ -66,9 +66,11 @@ mkdir -p "$BACKEND_SERVICES"
 mkdir -p "$FRONTEN_SERVICES"
 
 if [ -f "$APP_TYPES" ]; then
+  cp "$APP_TYPES" "./$BACKEND_DIR/src/types.ts"
   cp "$APP_TYPES" "./$BACKEND_SERVICES/types.ts"
-  echo "Copy types file successful! (backend, frontend)"
-  ls "$BACKEND_SERVICES/types.ts" 2>/dev/null || echo "Copy to backend failed."
+  echo "Copy types file successful! (backend)"
+  ls "$BACKEND_DIR/src/types.ts" 2>/dev/null || echo "Copy to backend/src failed."
+  ls "$BACKEND_SERVICES/types.ts" 2>/dev/null || echo "Copy to backend/services failed."
 else
   echo "Types file not exist → $APP_TYPES"
 fi
