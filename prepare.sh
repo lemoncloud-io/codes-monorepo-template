@@ -71,7 +71,7 @@ fi
 
 # 3. types.ts 파일 복사
 # ----------------------------------------------------------
-echo "[4/4] Copying frontend file..."
+dlrjgkf
 
 if [ -d "$APP_DIR/components" ]; then
   cp -rf "$APP_DIR/components/" "./$FRONTEN_SOURCE/components/"
@@ -88,6 +88,11 @@ if [ -d "$APP_DIR/utils" ]; then
   echo "Copy utils folder successful!"
   ls "$FRONTEN_SOURCE/utils" 2>/dev/null || echo "WARN! Copy to frontend/utils failed."
 fi
+if [ -d "$APP_DIR/pages" ]; then
+  cp -rf "$APP_DIR/pages/" "./$FRONTEN_SOURCE/pages/"
+  echo "Copy pages folder successful!"
+  ls "$FRONTEN_SOURCE/pages" 2>/dev/null || echo "WARN! Copy to frontend/pages failed."
+fi
 if [ -f "$APP_DIR/App.tsx" ]; then
   cp -rf "$APP_DIR/App.tsx" "./$FRONTEN_SOURCE/"
   echo "Copy App.tsx successful!"
@@ -102,11 +107,6 @@ if [ -f "$APP_DIR/constants.ts" ]; then
   cp -rf "$APP_DIR/constants.ts" "./$FRONTEN_SOURCE/"
   echo "Copy constants.ts successful!"
   ls "$FRONTEN_SOURCE/constants.ts" 2>/dev/null || echo "WARN! Copy to frontend/constants.ts failed."
-fi
-if [ -f "$APP_DIR/constants.tsx" ]; then
-  cp -rf "$APP_DIR/constants.tsx" "./$FRONTEN_SOURCE/"
-  echo "Copy constants.tsx successful!"
-  ls "$FRONTEN_SOURCE/constants.tsx" 2>/dev/null || echo "WARN! Copy to frontend/constants.tsx failed."
 fi
 if [ -f "$APP_DIR/index.html" ]; then
   cp -rf "$APP_DIR/index.html" "./$FRONTEN_SOURCE/../index.html"
