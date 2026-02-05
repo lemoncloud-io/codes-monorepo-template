@@ -71,7 +71,7 @@ fi
 
 # 3. types.ts 파일 복사
 # ----------------------------------------------------------
-dlrjgkf
+echo "[4/4] Copying frontend file..."
 
 if [ -d "$APP_DIR/components" ]; then
   cp -rf "$APP_DIR/components/" "./$FRONTEN_SOURCE/components/"
@@ -107,6 +107,11 @@ if [ -f "$APP_DIR/constants.ts" ]; then
   cp -rf "$APP_DIR/constants.ts" "./$FRONTEN_SOURCE/"
   echo "Copy constants.ts successful!"
   ls "$FRONTEN_SOURCE/constants.ts" 2>/dev/null || echo "WARN! Copy to frontend/constants.ts failed."
+fi
+if [ -f "$APP_DIR/constants.tsx" ]; then
+  cp -rf "$APP_DIR/constants.tsx" "./$FRONTEN_SOURCE/"
+  echo "Copy constants.tsx successful!"
+  ls "$FRONTEN_SOURCE/constants.tsx" 2>/dev/null || echo "WARN! Copy to frontend/constants.tsx failed."
 fi
 if [ -f "$APP_DIR/index.html" ]; then
   cp -rf "$APP_DIR/index.html" "./$FRONTEN_SOURCE/../index.html"
