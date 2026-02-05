@@ -41,7 +41,29 @@
 - `types.ts`은 참고용으로 원본 그대로 유지함 -> **아무것도 출력하지 않습니다.** (빈 응답)
 
 - **선택 파일:** `apps/frontend/src/App.tsx`
-- 보통은 `services/geminiService.ts`내의 함수 사용을 참고용을 -> **아무것도 출력하지 않습니다.** (빈 응답)
+> **import 경로 수정하기**
+> App.tsx 파일 내 모든 프로젝트 파일 import 경로를 아래 스텝에 따라 검증 후 수정하세요. (라이브러리 import는 제외)
+
+**[import 경로 검증 스텝]**
+
+1. import하려는 **메서드명**과 **파일명**으로 프로젝트 내 검색
+2. 메서드가 실제로 해당 파일에 **존재하는지 확인**
+3. 존재하면, **현재 파일(`App.tsx`) 기준 상대 경로**를 계산하여 import
+
+**[예시 시나리오]**
+
+```
+상황: App.tsx에서 generateSchedule 함수를 import하려 함
+원본 코드: import { generateSchedule } from './geminiService';  ← 잘못됨!
+
+스텝 1) generateSchedule + geminiService 검색
+스텝 2) 검색 결과: src/services/geminiService.ts 에서 발견
+스텝 3) App.tsx 위치: src/App.tsx
+        대상 파일 위치: src/services/geminiService.ts
+        → 상대 경로 계산: './services/geminiService'
+
+수정 결과: import { generateSchedule } from './services/geminiService';
+```
 
 - **원본 함수 파라미터 검증:**  
 - 절대! 원본 함수의 입력과 출력은 그대로 유지하여야 하며, `apiClient`를 이용한 호출로 변경합니다.

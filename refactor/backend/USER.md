@@ -29,9 +29,44 @@
 **[사전 검증 (Preflight) — 단계별 필수 조건 및 불충족 시 동작]**
 ● 1단계 (Service 리팩토링)
 
-- **필수 파일:** `apps/backend/src/services/geminiService.ts`  
+- **필수 파일:** `apps/backend/src/services/geminiService.ts`
 - 파일이 존재하지 않거나 메인 함수 자체가 없으면 -> **아무것도 출력하지 않습니다.** (빈 응답)
 - `API_KEY`를 환경변수에서 이용할 경우, `GEMINI_API_KEY`의 환경변수로도 이용할 수 있도록 변경 (ex: `process.env.API_KEY = process.env.API_KEY || process.env.GEMINI_API_KEY;`)
+- **(SDK 버전 주의)** `@google/genai` 패키지는 `GoogleGenAI`를 export합니다. 구버전 패턴(`@google/generative-ai`)이 있으면 반드시 신버전 패턴으로 변경하세요.
+
+  **[구버전→신버전 변환 규칙]**
+
+  | 구버전 (`@google/generative-ai`) | 신버전 (`@google/genai`) |
+  |--------------------------------|-------------------------|
+  | `import { GoogleGenerativeAI }` | `import { GoogleGenAI }` |
+  | `new GoogleGenerativeAI(apiKey)` | `new GoogleGenAI({ apiKey })` |
+  | `genAI.getGenerativeModel({ model })` | ❌ 사용하지 않음 |
+  | `model.generateContent(prompt)` | `ai.models.generateContent({ model, contents })` |
+  | `generationConfig: { ... }` | `config: { ... }` |
+  | `result.response` | ❌ 사용하지 않음 (response 직접 반환) |
+  | `response.text()` | `response.text` (메서드→속성) |
+  | `gemini-pro`, `gemini-1.5-flash` 등 | `gemini-2.5-flash` (**model은 필수 파라미터!**) |
+  | `role: "system"` 등 잘못된 role | `role: "user"` 또는 `role: "model"` 만 허용 |
+
+  **(model 필수!)** `model` 파라미터는 **절대 생략 불가**! 반드시 `model: "gemini-2.5-flash"`을 명시하세요. 구버전(`gemini-1.5-flash`, `gemini-pro`)은 사용 불가.
+  **(role 필수)** contents의 role은 `"user"` 또는 `"model"`만 허용됩니다. `"system"` 등 다른 값은 **400 에러** 발생!
+
+  **(구문 주의)** import 경로 및 문자열은 반드시 **일반 따옴표(`'` 또는 `"`)** 를 사용하세요. 백틱(\`)은 import 경로에 사용 금지!
+  - ✅ `import { GoogleGenAI } from "@google/genai";`
+  - ❌ `import { GoogleGenAI } from \`@google/genai\`;` ← **구문 에러 발생**
+
+  **[GoogleGenAI 사용예제]**
+
+  ```ts
+  import { GoogleGenAI } from "@google/genai";
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: [{ role: "user", parts: [{ text: "Hello" }] }],
+    config: { responseMimeType: "application/json" },  // generationConfig 대신 config 사용
+  });
+  console.log(response.text);  // .text() 가 아닌 .text 속성 사용
+  ```
 
 - **선택 파일:** `apps/backend/src/services/types.ts`  
 - 파일이 존재하지 않는 경우 → **상단에 `./types`타입 import 코드를 추가하지 않으며**, `$param` 구조 리팩토링만 수행합니다.

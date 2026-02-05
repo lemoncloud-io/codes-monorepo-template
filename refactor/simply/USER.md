@@ -126,14 +126,59 @@ apps
 
 3. `apps/frontend/src/App.tsx` 파일 작업
 
-- 보통은 `geminiService.ts`내의 함수 사용을 참고용을 -> **아무것도 출력하지 않습니다.** (빈 응답)
-- 단, `geminiService.ts` 함수의 파라미터 변경시 호출 부분에서 함께 변경 필요함!
+- **선택 파일:** `apps/frontend/src/App.tsx`
+
+> **import 경로 수정하기**
+> App.tsx 파일 내 모든 프로젝트 파일 import 경로를 아래 스텝에 따라 검증 후 수정하세요. (라이브러리 import는 제외)
+
+**[import 경로 검증 스텝]**
+
+1. import하려는 **메서드명**과 **파일명**으로 프로젝트 내 검색
+2. 메서드가 실제로 해당 파일에 **존재하는지 확인**
+3. 존재하면, **현재 파일(`App.tsx`) 기준 상대 경로**를 계산하여 import
+
+**[예시 시나리오]**
+
+```
+상황: App.tsx에서 generateSchedule 함수를 import하려 함
+원본 코드: import { generateSchedule } from './geminiService';  ← 잘못됨!
+
+스텝 1) generateSchedule + geminiService 검색
+스텝 2) 검색 결과: src/services/geminiService.ts 에서 발견
+스텝 3) App.tsx 위치: src/App.tsx
+        대상 파일 위치: src/services/geminiService.ts
+        → 상대 경로 계산: './services/geminiService'
+
+수정 결과: import { generateSchedule } from './services/geminiService';
+```
 
 ### 작업 2단계: 백엔드
 
 > 백엔드에서의 리팩토링 주요 작업은 `hello-api.ts` 와 `geminiService.ts` 코드내 함수의 연결입니다.
 > **절대** 반드시 `@google/genai` 패키지의 `GoogleGenAI`를 이용하는 기존 코드는 그대로 유지합니다 → **GoogleGenAI() 사용 코드 유지**
 > **주의** `geminiService.ts` 코드내 함수들의 파라미터 변경만 적용합니다.
+> **(SDK 버전 주의)** `@google/genai` 패키지는 `GoogleGenAI`를 export합니다. 구버전 패턴(`@google/generative-ai`)이 있으면 반드시 신버전 패턴으로 변경하세요.
+
+  **[구버전→신버전 변환 규칙]**
+
+  | 구버전 (`@google/generative-ai`) | 신버전 (`@google/genai`) |
+  |--------------------------------|-------------------------|
+  | `import { GoogleGenerativeAI }` | `import { GoogleGenAI }` |
+  | `new GoogleGenerativeAI(apiKey)` | `new GoogleGenAI({ apiKey })` |
+  | `genAI.getGenerativeModel({ model })` | ❌ 사용하지 않음 |
+  | `model.generateContent(prompt)` | `ai.models.generateContent({ model, contents })` |
+  | `generationConfig: { ... }` | `config: { ... }` |
+  | `result.response` | ❌ 사용하지 않음 (response 직접 반환) |
+  | `response.text()` | `response.text` (메서드→속성) |
+  | `gemini-pro`, `gemini-1.5-flash` 등 | `gemini-2.5-flash` (**model은 필수 파라미터!**) |
+  | `role: "system"` 등 잘못된 role | `role: "user"` 또는 `role: "model"` 만 허용 |
+
+  **(model 필수!)** `model` 파라미터는 **절대 생략 불가**! 반드시 `model: "gemini-2.5-flash"`을 명시하세요. 구버전(`gemini-1.5-flash`, `gemini-pro`)은 사용 불가.
+  **(role 필수)** contents의 role은 `"user"` 또는 `"model"`만 허용됩니다. `"system"` 등 다른 값은 **400 에러** 발생!
+
+  **(구문 주의)** import 경로 및 문자열은 반드시 **일반 따옴표(`'` 또는 `"`)** 를 사용하세요. 백틱(\`)은 import 경로에 사용 금지!
+  - ✅ `import { GoogleGenAI } from "@google/genai";`
+  - ❌ `import { GoogleGenAI } from \`@google/genai\`;` ← **구문 에러 발생**
 
   **[GoogleGenAI 사용예제]**
 
@@ -142,9 +187,10 @@ apps
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash",
-    contents: '#prompt to say hello',
+    contents: [{ role: "user", parts: [{ text: "Hello" }] }],
+    config: { responseMimeType: "application/json" },  // generationConfig 대신 config 사용
   });
-  console.log(response.text.trim());
+  console.log(response.text);  // .text() 가 아닌 .text 속성 사용
   ```
 
 1. `apps/backend/src/services/types.ts` 파일 작업

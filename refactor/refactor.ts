@@ -60,6 +60,8 @@ async function refactorCode(args: string[]) {
         // maxOutputTokens: 2048, //WARN - may not work!
       },
     };
+
+    console.log(params);
     fs.saveFile(`logs/params-${runType}${runStep ? '-' + runStep : ''}.yml`, params);
 
     // 5. 호출 실행
