@@ -6,6 +6,7 @@
 import React, { useState } from 'react';
 import { Image as ImageIcon, Settings } from "lucide-react";
 import { GeminiService } from './services/geminiService';
+import { CalcService } from './mock/calcService';
 import { BannerInput } from './components/BannerInput';
 import { BannerPreview } from './components/BannerPreview';
 
@@ -50,6 +51,7 @@ const SAMPLES = [
 export default function App() {
   type CalcOperation = "add" | "minus" | "divide" | "multiply";
   const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  const calcApiBaseUrl = import.meta.env.VITE_CALC_API_BASE_URL || 'http://localhost:8830';
 
   const [markdown, setMarkdown] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -157,9 +159,12 @@ export default function App() {
     setCalcError(null);
 
     try {
-      const geminiService = new GeminiService({apiKey: ''});
-      const result = await geminiService.add(id as CalcOperation, a, b);
-      setCalcResult(result);
+      const calcService = new CalcService({
+        baseUrl: calcApiBaseUrl,
+        isMock: false,
+      });
+      const result = await calcService.calc(id as CalcOperation, a, b);
+      setCalcResult(result.v);
     } catch (err: any) {
       console.error("Calculation error:", err);
       setCalcResult(null);
