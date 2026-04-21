@@ -77,44 +77,4 @@ ${markdown}
 
     return imageUrl;
   }
-
-  /**
-   * calculate using API (for test)
-   * - calls `POST /hello/{id}/add` in `eureka-agents-api`
-   * - success response: { v: number }
-   */
-  async add(
-    id: "add" | "minus" | "divide" | "multiply" | string,
-    a: number,
-    b: number
-  ): Promise<number> {
-    try {
-      const apiId = id === "add" ? "0" : id;
-      const response = await fetch(`http://localhost:8830/hello/${apiId}/add`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ a, b }),
-      });
-
-      // parse response json
-      const data = await response.json().catch(() => null);
-
-      // check response.ok explicitly.
-      if (!response.ok) {
-        throw new Error(`Add API request failed with status ${response.status}`);
-      }
-
-      // return calculate result
-      if (typeof data?.v === "number") {
-        return data.v;
-      }
-
-      throw new Error("Unexpected response format from add API.");
-    } catch (e) {
-      // Normalize unknown thrown values into Error.
-      throw new Error(e instanceof Error ? e.message : String(e));
-    }
-  }
 }
