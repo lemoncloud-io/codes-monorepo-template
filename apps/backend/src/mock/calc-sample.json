@@ -1,0 +1,24 @@
+{
+  "!": "This data file is for the calcService simulation.",
+  "0": {
+    "request": { "a": 1, "b": 2 },
+    "response": { "v": 3 }
+  },
+  "add": {
+    "request": { "a": 1, "b": 2 },
+    "response": { "v": 3 }
+  },
+  "minus": {
+    "request": { "a": 1, "b": 2 },
+    "response": { "v": -1 }
+  },
+  "divide": {
+    "request": { "a": 1, "b": 2 },
+    "response": { "v": 0.5 }
+  },
+  "multiply": {
+    "request": { "a": 1, "b": 2 },
+    "response": { "v": 2 }
+  }
+}
+ 
