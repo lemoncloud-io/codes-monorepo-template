@@ -107,7 +107,7 @@ export class HttpAbstractGenAI implements ProxyGenAI {
     private readonly transportId?: string;
     private readonly transport?: ProxyTransportReceiver;
 
-    public constructor(private readonly endpoint: string, options: HttpAbstractGenAIOptions = {}) {
+    public constructor(protected readonly endpoint: string, options: HttpAbstractGenAIOptions = {}) {
         this.fetcher = options.fetch ?? fetch;
         this.headers = options.headers ?? {};
         this.transportId = options.transportId;
@@ -149,7 +149,7 @@ export class HttpAbstractGenAI implements ProxyGenAI {
         return this.transport.wait(this.transportId!, task);
     }
 
-    private asEndpoint(): string {
+    protected asEndpoint(): string {
         if (!this.transportId) return this.endpoint;
         const url = new URL(this.endpoint, 'http://localhost');
         url.searchParams.set('transportId', this.transportId);

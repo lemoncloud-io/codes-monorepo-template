@@ -4,6 +4,13 @@ import { AnalysisResult, GenerationStep } from "../types";
 import { BrowserWebSocketNetwork, createProxyTransportReceiver, HttpAbstractGenAI, waitWebSocketConnectionId } from "./proxy";
 export type { AnalysisResult, GenerationStep };
 
+declare global {
+    interface Window {
+        VITE_API_URL?: string;
+        VITE_API_KEY?: string;
+    }
+}
+
 const getAI = async () => {
   const ws = new WebSocket('wss://wss.eureka.codes/cht-d1?v2');
   const network = new BrowserWebSocketNetwork(ws);
@@ -18,10 +25,31 @@ const getAI = async () => {
       timeoutMs: 30_000,
   });
   console.log("WebSocket connected with transport ID:", connectionId);
-  const ai = new HttpAbstractGenAI('http://localhost:8830/agents/!/generate', {
-      transportId: connectionId,
-      transport,
-  });
+  const ep = window.VITE_API_URL || import.meta.env?.VITE_API_URL || 'http://localhost:8830/agents/!/generate';
+  console.log("Using API endpoint:", ep);
+  const ki = window.VITE_API_KEY || import.meta.env?.VITE_API_KEY || '****';
+
+
+  //* make http proxy.
+  const ai = new class extends HttpAbstractGenAI {
+      constructor() {
+          super(ep, {
+              transportId: connectionId,
+              transport,
+              headers: {
+                  'x-api-key': ki,
+              },
+          });
+      }
+      protected asEndpoint() {
+        if (!connectionId) return this.endpoint;
+        const url = new URL(this.endpoint, 'http://localhost');
+        url.searchParams.set('connection', connectionId);
+        url.searchParams.set('transport', '1');
+        if (/^https?:\/\//.test(this.endpoint)) return url.toString();
+        return `${url.pathname}${url.search}${url.hash}`;
+      }
+  };
   return ai;
 };
 
