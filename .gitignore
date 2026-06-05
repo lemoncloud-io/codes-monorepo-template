@@ -4,6 +4,7 @@ node_modules/
 # sample files but not zip files
 sample/**
 !sample/*.zip
+!sample/ai-content-banner-generator/**
 
 # Build outputs
 dist/
