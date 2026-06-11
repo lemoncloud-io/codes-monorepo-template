@@ -1,7 +1,7 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import { Type } from "@google/genai";
+import { BrowserWebSocketNetwork, createProxyTransportReceiver, HttpAbstractGenAI, waitWebSocketConnectionId } from "lemon-model";
 
 import { AnalysisResult, GenerationStep } from "../types";
-import { BrowserWebSocketNetwork, createProxyTransportReceiver, HttpAbstractGenAI, waitWebSocketConnectionId } from "./proxy";
 export type { AnalysisResult, GenerationStep };
 
 declare global {
@@ -25,7 +25,7 @@ const getAI = async () => {
       timeoutMs: 30_000,
   });
   console.log("WebSocket connected with transport ID:", connectionId);
-  const ep = window.VITE_API_URL || import.meta.env?.VITE_API_URL || 'http://localhost:8830/agents/!/generate';
+  const ep = window.VITE_API_URL || import.meta.env?.VITE_API_URL || 'http://localhost:8800/runs/0/generate';
   console.log("Using API endpoint:", ep);
   const ki = window.VITE_API_KEY || import.meta.env?.VITE_API_KEY || '****';
 
