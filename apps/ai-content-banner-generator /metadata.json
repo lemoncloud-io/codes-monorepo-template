@@ -1,0 +1,5 @@
+{
+  "name": "AI Content Banner Generator",
+  "description": "Generate high-quality banner images from Markdown content using Gemini AI.",
+  "requestFramePermissions": []
+}

@@ -18,7 +18,7 @@
     },
     "dependencies": {
         "lemon-core": "^4.0.7",
-        "lemon-model": "^1.0.6"
+        "lemon-model": "^1.2.1"
     },
     "devDependencies": {
         "@types/jest": "^27.5.0",
